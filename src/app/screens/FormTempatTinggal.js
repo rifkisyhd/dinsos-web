@@ -18,13 +18,18 @@ export default function FormTempatTinggal({ setStep }) {
     const [kabupatenList, setKabupatenList] = useState([]);
     const [kecamatanList, setKecamatanList] = useState([]);
     const [kelurahanList, setKelurahanList] = useState([]);
+    const [isLoading, setIsLoading] = useState({
+        kabupaten: true,
+        kecamatan: false,
+        kelurahan: false,
+    });
 
     useEffect(() => {
-        // Fetch Kabupaten Jawa Timur
         const fetchKabupaten = async () => {
+            setIsLoading(prev => ({ ...prev, kabupaten: true }));
             try {
                 const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_WILAYAH}/regencies/35.json` // ID Jawa Timur adalah 35
+                    `${process.env.NEXT_PUBLIC_API_WILAYAH}/regencies/35.json`
                 );
                 const data = await response.json();
                 setKabupatenList(
@@ -32,6 +37,8 @@ export default function FormTempatTinggal({ setStep }) {
                 );
             } catch (error) {
                 console.error("Error fetching kabupaten:", error.message);
+            } finally {
+                setIsLoading(prev => ({ ...prev, kabupaten: false }));
             }
         };
 
@@ -39,6 +46,9 @@ export default function FormTempatTinggal({ setStep }) {
     }, []);
 
     const fetchKecamatan = async (kabupatenId) => {
+        setIsLoading(prev => ({ ...prev, kecamatan: true, kelurahan: false }));
+        setKecamatanList([]);
+        setKelurahanList([]);
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_WILAYAH}/districts/${kabupatenId}.json`
@@ -49,10 +59,14 @@ export default function FormTempatTinggal({ setStep }) {
             );
         } catch (error) {
             console.error("Error fetching kecamatan:", error.message);
+        } finally {
+            setIsLoading(prev => ({ ...prev, kecamatan: false }));
         }
     };
 
     const fetchKelurahan = async (kecamatanId) => {
+        setIsLoading(prev => ({ ...prev, kelurahan: true }));
+        setKelurahanList([]);
         try {
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_WILAYAH}/villages/${kecamatanId}.json`
@@ -63,6 +77,8 @@ export default function FormTempatTinggal({ setStep }) {
             );
         } catch (error) {
             console.error("Error fetching kelurahan:", error.message);
+        } finally {
+            setIsLoading(prev => ({ ...prev, kelurahan: false }));
         }
     };
 
@@ -74,92 +90,106 @@ export default function FormTempatTinggal({ setStep }) {
     };
 
     return (
-        <form className="max-w-md mx-auto bg-white p-6 rounded shadow">
-            <h2 className="text-center text-blue-600 font-bold mb-4">
-                *** PENDAFTARAN PESERTA DIDIK BARU SEKOLAH RAKYAT ***
+        // --- 1. Tampilan "Card" yang lebih modern ---
+        <form className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+            
+            {/* --- 2. Tipografi & Hirarki Header yang lebih jelas --- */}
+            <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">
+                Pendaftaran Peserta Didik Baru
             </h2>
-            <p className="text-green-600 font-semibold mb-2">
+            <p className="text-center text-gray-500 mb-8">Sekolah Rakyat</p>
+
+            <p className="text-lg font-semibold text-blue-600 mb-6 border-b pb-2">
                 Blok 2 - Tempat Tinggal
             </p>
 
-            {/* Provinsi */}
-            <label className="block mb-2">Provinsi</label>
+            {/* --- 3. Label dan Input Fields yang diperbarui --- */}
+            <label className="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
             <Select
-                options={[{ value: "35", label: "Jawa Timur" }]} // Jawa Timur tetap
+                options={[{ value: "35", label: "Jawa Timur" }]}
                 value={{ value: form.provinsi, label: "Jawa Timur" }}
-                onChange={(selectedOption) =>
-                    handleChange("provinsi", selectedOption.value)
-                }
+                isDisabled={true}
                 className="mb-4"
             />
 
-            {/* Kabupaten */}
-            <label className="block mb-2">Kabupaten / Kota</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kabupaten / Kota</label>
             <Select
                 options={kabupatenList}
                 value={kabupatenList.find((item) => item.value === form.kabupaten)}
                 onChange={(selectedOption) => {
                     handleChange("kabupaten", selectedOption.value);
-                    fetchKecamatan(selectedOption.value); // Fetch Kecamatan berdasarkan Kabupaten
+                    fetchKecamatan(selectedOption.value);
                 }}
+                isLoading={isLoading.kabupaten}
+                placeholder={isLoading.kabupaten ? "Memuat..." : "Pilih Kabupaten / Kota"}
                 className="mb-4"
             />
 
-            {/* Kecamatan */}
-            <label className="block mb-2">Kecamatan</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kecamatan</label>
             <Select
                 options={kecamatanList}
                 value={kecamatanList.find((item) => item.value === form.kecamatan)}
                 onChange={(selectedOption) => {
                     handleChange("kecamatan", selectedOption.value);
-                    fetchKelurahan(selectedOption.value); // Fetch Kelurahan berdasarkan Kecamatan
+                    fetchKelurahan(selectedOption.value);
                 }}
+                isLoading={isLoading.kecamatan}
+                placeholder={isLoading.kecamatan ? "Memuat..." : "Pilih Kecamatan"}
+                isDisabled={!form.kabupaten || isLoading.kecamatan}
                 className="mb-4"
             />
 
-            {/* Kelurahan */}
-            <label className="block mb-2">Kelurahan / Desa</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kelurahan / Desa</label>
             <Select
                 options={kelurahanList}
                 value={kelurahanList.find((item) => item.value === form.kelurahan)}
                 onChange={(selectedOption) =>
                     handleChange("kelurahan", selectedOption.value)
                 }
+                isLoading={isLoading.kelurahan}
+                placeholder={isLoading.kelurahan ? "Memuat..." : "Pilih Kelurahan / Desa"}
+                isDisabled={!form.kecamatan || isLoading.kelurahan}
                 className="mb-4"
             />
 
-            {/* RW */}
-            <label className="block mb-2">RW</label>
-            <input
-                name="rw"
-                value={form.rw}
-                onChange={(e) => handleChange("rw", e.target.value)}
-                className="w-full border p-2 mb-4"
-                placeholder="Masukkan RW"
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">RW</label>
+                    <input
+                        name="rw"
+                        value={form.rw}
+                        onChange={(e) => handleChange("rw", e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                        placeholder="Contoh: 005"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">RT</label>
+                    <input
+                        name="rt"
+                        value={form.rt}
+                        onChange={(e) => handleChange("rt", e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                        placeholder="Contoh: 001"
+                    />
+                </div>
+            </div>
 
-            {/* RT */}
-            <label className="block mb-2">RT</label>
-            <input
-                name="rt"
-                value={form.rt}
-                onChange={(e) => handleChange("rt", e.target.value)}
-                className="w-full border p-2 mb-4"
-                placeholder="Masukkan RT"
-            />
-
-            {/* Alamat */}
-            <label className="block mb-2">Alamat</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
             <textarea
                 name="alamat"
                 value={form.alamat}
                 onChange={(e) => handleChange("alamat", e.target.value)}
-                className="w-full border p-2 mb-4"
-                placeholder="Masukkan alamat lengkap"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                placeholder="Masukkan nama jalan, nomor rumah, atau patokan lainnya"
+                rows="3"
             />
 
-            <Button label="Sebelumnya" onClick={() => setStep(1)} />
-            <Button label="Selanjutnya" onClick={() => setStep(3)} />
+            {/* Area Tombol yang sudah diperbaiki */}
+            <div className="flex justify-between mt-6">
+                <Button label="Sebelumnya" onClick={() => setStep(1)} />
+                <Button label="Selanjutnya" onClick={() => setStep(3)} />
+            </div>
         </form>
     );
 }

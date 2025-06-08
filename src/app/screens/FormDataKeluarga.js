@@ -5,6 +5,7 @@ import Select from "react-select";
 import Button from "../components/Button";
 import { createClient } from "@supabase/supabase-js";
 
+// Sebaiknya client ini dipindah ke file terpisah (misal: src/lib/supabaseClient.js)
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -29,12 +30,10 @@ export default function FormDataKeluarga({ setStep }) {
     const [penghasilanOptions, setPenghasilanOptions] = useState([]);
 
     useEffect(() => {
+        // ... (logika fetch data Anda tidak perlu diubah, sudah bagus)
         const fetchPekerjaan = async () => {
             try {
-                const { data, error } = await supabase
-                    .from("pekerjaan")
-                    .select("*");
-
+                const { data, error } = await supabase.from("pekerjaan").select("*");
                 if (error) throw error;
                 setPekerjaanOptions(
                     data.map((item) => ({ value: item.nama, label: item.nama }))
@@ -46,10 +45,7 @@ export default function FormDataKeluarga({ setStep }) {
 
         const fetchPenghasilan = async () => {
             try {
-                const { data, error } = await supabase
-                    .from("penghasilan")
-                    .select("*");
-
+                const { data, error } = await supabase.from("penghasilan").select("*");
                 if (error) throw error;
                 setPenghasilanOptions(
                     data.map((item) => ({ value: item.range, label: item.range }))
@@ -71,111 +67,128 @@ export default function FormDataKeluarga({ setStep }) {
     };
 
     return (
-        <form className="max-w-md mx-auto bg-white p-6 rounded shadow">
-            <h2 className="text-center text-blue-600 font-bold mb-4">
-                *** PENDAFTARAN PESERTA DIDIK BARU SEKOLAH RAKYAT ***
+        // --- 1. Tampilan "Card" yang lebih modern ---
+        <form className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+            
+            {/* --- 2. Tipografi & Hirarki Header yang lebih jelas --- */}
+            <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">
+                Pendaftaran Peserta Didik Baru
             </h2>
-            <p className="text-green-600 font-semibold mb-2">
-                Blok 4 - Data Keluarga
+            <p className="text-center text-gray-500 mb-8">Sekolah Rakyat</p>
+
+            <p className="text-lg font-semibold text-blue-600 mb-6 border-b pb-2">
+                Blok 3 - Data Keluarga
             </p>
 
-            <label className="block mb-2">Ayah</label>
+            {/* --- 3. Label dan Input Fields yang diperbarui --- */}
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ayah</label>
             <input
                 name="ayah"
                 value={form.ayah}
                 onChange={(e) => handleChange("ayah", e.target.value)}
-                className="w-full border p-2 mb-4"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                 placeholder="Masukkan nama ayah"
             />
 
-            <label className="block mb-2">Ibu</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ibu</label>
             <input
                 name="ibu"
                 value={form.ibu}
                 onChange={(e) => handleChange("ibu", e.target.value)}
-                className="w-full border p-2 mb-4"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                 placeholder="Masukkan nama ibu"
             />
 
-            <label className="block mb-2">Pekerjaan Ayah sesuai KTP</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Pekerjaan Ayah sesuai KTP</label>
             <Select
                 options={pekerjaanOptions}
                 value={pekerjaanOptions.find((item) => item.value === form.pekerjaanAyah)}
                 onChange={(selectedOption) => handleChange("pekerjaanAyah", selectedOption.value)}
                 className="mb-4"
+                placeholder="Pilih Pekerjaan Ayah"
             />
 
-            <label className="block mb-2">Pekerjaan Ibu sesuai KTP</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Pekerjaan Ibu sesuai KTP</label>
             <Select
                 options={pekerjaanOptions}
                 value={pekerjaanOptions.find((item) => item.value === form.pekerjaanIbu)}
                 onChange={(selectedOption) => handleChange("pekerjaanIbu", selectedOption.value)}
                 className="mb-4"
+                placeholder="Pilih Pekerjaan Ibu"
             />
 
-            <label className="block mb-2">Penjelasan Pekerjaan Ayah dan Ibu</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Penjelasan Pekerjaan Ayah dan Ibu</label>
             <textarea
                 name="penjelasanPekerjaan"
                 value={form.penjelasanPekerjaan}
                 onChange={(e) => handleChange("penjelasanPekerjaan", e.target.value)}
-                className="w-full border p-2 mb-4"
-                placeholder="Masukkan penjelasan pekerjaan ayah dan ibu"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                placeholder="Contoh: Ayah bekerja serabutan, Ibu di rumah saja"
+                rows="3"
             />
 
-            <label className="block mb-2">Wali Calon Siswa (Jika tidak memiliki orang tua)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Wali Calon Siswa (Jika tidak memiliki orang tua)</label>
             <input
                 name="wali"
                 value={form.wali}
                 onChange={(e) => handleChange("wali", e.target.value)}
-                className="w-full border p-2 mb-4"
-                placeholder="Masukkan nama wali"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                placeholder="Masukkan nama wali (opsional)"
             />
 
-            <label className="block mb-2 text-blue-600">Penghasilan Keluarga Perbulan</label>
+            <label className="block text-sm font-medium text-blue-600 mb-1">Penghasilan Keluarga Perbulan</label>
             <Select
                 options={penghasilanOptions}
                 value={penghasilanOptions.find((item) => item.value === form.penghasilan)}
                 onChange={(selectedOption) => handleChange("penghasilan", selectedOption.value)}
                 className="mb-4"
+                placeholder="Pilih Range Penghasilan"
             />
 
-            <label className="block mb-2">Nominal Penghasilan Keluarga</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nominal Penghasilan Keluarga</label>
             <input
                 name="nominalPenghasilan"
+                type="number"
                 value={form.nominalPenghasilan}
                 onChange={(e) => handleChange("nominalPenghasilan", e.target.value)}
-                className="w-full border p-2 mb-4"
-                placeholder="Masukkan nominal penghasilan keluarga"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                placeholder="Contoh: 1500000"
             />
 
-            <label className="block mb-2 text-yellow-600">Pengeluaran Keluarga Perbulan</label>
+            <label className="block text-sm font-medium text-yellow-600 mb-1">Pengeluaran Keluarga Perbulan</label>
             <Select
-                options={penghasilanOptions} // Gunakan penghasilanOptions untuk pengeluaran
+                options={penghasilanOptions} 
                 value={penghasilanOptions.find((item) => item.value === form.pengeluaran)}
                 onChange={(selectedOption) => handleChange("pengeluaran", selectedOption.value)}
                 className="mb-4"
+                placeholder="Pilih Range Pengeluaran"
             />
 
-            <label className="block mb-2">Nominal Pengeluaran Keluarga</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nominal Pengeluaran Keluarga</label>
             <input
                 name="nominalPengeluaran"
+                type="number"
                 value={form.nominalPengeluaran}
                 onChange={(e) => handleChange("nominalPengeluaran", e.target.value)}
-                className="w-full border p-2 mb-4"
-                placeholder="Masukkan nominal pengeluaran keluarga"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                placeholder="Contoh: 1000000"
             />
 
-            <label className="block mb-2">Jumlah Tanggungan</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Tanggungan</label>
             <input
                 name="jumlahTanggungan"
+                type="number"
                 value={form.jumlahTanggungan}
                 onChange={(e) => handleChange("jumlahTanggungan", e.target.value)}
-                className="w-full border p-2 mb-4"
-                placeholder="Masukkan jumlah tanggungan"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                placeholder="Masukkan jumlah orang yang ditanggung"
             />
 
-            <Button label="Sebelumnya" onClick={() => setStep(2)} />
-            <Button label="Selanjutnya" onClick={() => setStep(5)} />
+            {/* Area Tombol yang sudah responsif */}
+            <div className="flex justify-between mt-6">
+                <Button label="Sebelumnya" onClick={() => setStep(2)} />
+                <Button label="Selanjutnya" onClick={() => setStep(4)} />
+            </div>
         </form>
     );
 }

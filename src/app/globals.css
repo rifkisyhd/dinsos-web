@@ -19,29 +19,10 @@
     }
 }
 
-html, body {
-    min-height: 100vh; /* Pastikan elemen root memiliki tinggi minimal penuh viewport */
-    margin: 0; /* Hapus margin default */
-    padding: 0; /* Hapus padding default */
-    box-sizing: border-box; /* Pastikan padding tidak memengaruhi ukuran */
-    overflow-y: auto; /* Aktifkan scroll vertikal di halaman */
-}
-
 body {
     background: var(--background);
     color: var(--foreground);
     font-family: Arial, Helvetica, sans-serif;
     display: flex; /* Gunakan Flexbox untuk memastikan konten berada di atas */
-    flex-direction: column; /* Atur elemen secara vertikal */
-    justify-content: flex-start; /* Pastikan konten dimulai dari atas */
-    align-items: center; /* Pusatkan konten secara horizontal */
-}
-
-form {
-    max-width: 600px; /* Batasi lebar form */
-    margin: 0 auto; /* Pusatkan form secara horizontal */
-    padding: 1rem; /* Tambahkan padding di dalam form */
-    box-sizing: border-box; /* Pastikan padding tidak memengaruhi ukuran form */
-    overflow: visible; /* Pastikan form tidak memiliki scroll sendiri */
 }
 
