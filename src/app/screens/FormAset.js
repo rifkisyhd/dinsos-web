@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Select from "react-select";
+import { supabase } from "@/lib/supabaseClient";
+
+import TitleForm from "../components/TitleForm";
 import Button from "../components/Button";
-import { supabase } from "@/lib/supabaseClient"; // Menggunakan client terpusat
 
 export default function FormAset({ setStep }) {
     const [form, setForm] = useState({
@@ -81,14 +83,7 @@ export default function FormAset({ setStep }) {
             className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100"
             onSubmit={handleSubmit}
         >
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">
-                PENDAFTARAN PESERTA DIDIK BARU SEKOLAH RAKYAT
-            </h2>
-            <p className="text-center text-gray-500 mb-8">TAHUN AJARAN 2025-2026</p>
-
-            <p className="text-lg font-semibold text-blue-600 mb-6 border-b pb-2">
-                Blok 4 - Aset Yang Dimiliki Keluarga
-            </p>
+               <TitleForm blok=" Blok 4 - Aset Yang Dimiliki Keluarga" />
 
             <label className="block text-sm font-medium text-gray-700 mb-1">Status Kepemilikan Tanah</label>
             <Select
@@ -160,7 +155,7 @@ export default function FormAset({ setStep }) {
             {/* Area Tombol */}
             <div className="flex justify-between mt-6">
                 <Button label="Sebelumnya" onClick={() => setStep(3)} />
-                <Button label="Selanjutnya" type="submit" />
+                <Button label="Selanjutnya" onClick={() => setStep(5)} />
             </div>
         </form>
     );

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Select from "react-select";
+
+import TitleForm from "../components/TitleForm";    
 import Button from "../components/Button";
 
 export default function FormTempatTinggal({ setStep }) {
@@ -90,20 +92,10 @@ export default function FormTempatTinggal({ setStep }) {
     };
 
     return (
-        // --- 1. Tampilan "Card" yang lebih modern ---
         <form className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
             
-            {/* --- 2. Tipografi & Hirarki Header yang lebih jelas --- */}
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-2">
-                Pendaftaran Peserta Didik Baru
-            </h2>
-            <p className="text-center text-gray-500 mb-8">Sekolah Rakyat</p>
+              <TitleForm blok=" Blok 2 - Tempat Tinggal Siswa" />
 
-            <p className="text-lg font-semibold text-blue-600 mb-6 border-b pb-2">
-                Blok 2 - Tempat Tinggal
-            </p>
-
-            {/* --- 3. Label dan Input Fields yang diperbarui --- */}
             <label className="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
             <Select
                 options={[{ value: "35", label: "Jawa Timur" }]}
