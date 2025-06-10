@@ -3,20 +3,10 @@
 import { useState, useEffect } from "react";
 import Select from "react-select";
 
-import TitleForm from "../components/TitleForm";    
+import TitleForm from "../components/TitleForm";
 import Button from "../components/Button";
 
-export default function FormTempatTinggal({ setStep }) {
-    const [form, setForm] = useState({
-        provinsi: "",
-        kabupaten: "",
-        kecamatan: "",
-        kelurahan: "",
-        rw: "",
-        rt: "",
-        alamat: "",
-    });
-
+export default function FormTempatTinggal({ setStep, form, setForm }) {
     const [kabupatenList, setKabupatenList] = useState([]);
     const [kecamatanList, setKecamatanList] = useState([]);
     const [kelurahanList, setKelurahanList] = useState([]);
@@ -28,19 +18,19 @@ export default function FormTempatTinggal({ setStep }) {
 
     useEffect(() => {
         const fetchKabupaten = async () => {
-            setIsLoading(prev => ({ ...prev, kabupaten: true }));
+            setIsLoading((prev) => ({ ...prev, kabupaten: true }));
             try {
                 const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_WILAYAH}/regencies/35.json`
+                    `${process.env.NEXT_PUBLIC_API_WILAYAH}/regencies/35.json`,
                 );
                 const data = await response.json();
                 setKabupatenList(
-                    data.map((item) => ({ value: item.id, label: item.name }))
+                    data.map((item) => ({ value: item.id, label: item.name })),
                 );
             } catch (error) {
                 console.error("Error fetching kabupaten:", error.message);
             } finally {
-                setIsLoading(prev => ({ ...prev, kabupaten: false }));
+                setIsLoading((prev) => ({ ...prev, kabupaten: false }));
             }
         };
 
@@ -48,39 +38,43 @@ export default function FormTempatTinggal({ setStep }) {
     }, []);
 
     const fetchKecamatan = async (kabupatenId) => {
-        setIsLoading(prev => ({ ...prev, kecamatan: true, kelurahan: false }));
+        setIsLoading((prev) => ({
+            ...prev,
+            kecamatan: true,
+            kelurahan: false,
+        }));
         setKecamatanList([]);
         setKelurahanList([]);
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_WILAYAH}/districts/${kabupatenId}.json`
+                `${process.env.NEXT_PUBLIC_API_WILAYAH}/districts/${kabupatenId}.json`,
             );
             const data = await response.json();
             setKecamatanList(
-                data.map((item) => ({ value: item.id, label: item.name }))
+                data.map((item) => ({ value: item.id, label: item.name })),
             );
         } catch (error) {
             console.error("Error fetching kecamatan:", error.message);
         } finally {
-            setIsLoading(prev => ({ ...prev, kecamatan: false }));
+            setIsLoading((prev) => ({ ...prev, kecamatan: false }));
         }
     };
 
     const fetchKelurahan = async (kecamatanId) => {
-        setIsLoading(prev => ({ ...prev, kelurahan: true }));
+        setIsLoading((prev) => ({ ...prev, kelurahan: true }));
         setKelurahanList([]);
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_WILAYAH}/villages/${kecamatanId}.json`
+                `${process.env.NEXT_PUBLIC_API_WILAYAH}/villages/${kecamatanId}.json`,
             );
             const data = await response.json();
             setKelurahanList(
-                data.map((item) => ({ value: item.id, label: item.name }))
+                data.map((item) => ({ value: item.id, label: item.name })),
             );
         } catch (error) {
             console.error("Error fetching kelurahan:", error.message);
         } finally {
-            setIsLoading(prev => ({ ...prev, kelurahan: false }));
+            setIsLoading((prev) => ({ ...prev, kelurahan: false }));
         }
     };
 
@@ -96,57 +90,82 @@ export default function FormTempatTinggal({ setStep }) {
             
               <TitleForm blok=" Blok 3 - Tempat Tinggal Siswa" />
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Provinsi
+            </label>
             <Select
                 options={[{ value: "35", label: "Jawa Timur" }]}
-                value={{ value: form.provinsi, label: "Jawa Timur" }}
+                value={{
+                    value: form.provinsi,
+                    label: "Jawa Timur",
+                }}
                 isDisabled={true}
                 className="mb-4"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Kabupaten / Kota</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Kabupaten / Kota
+            </label>
             <Select
                 options={kabupatenList}
-                value={kabupatenList.find((item) => item.value === form.kabupaten)}
+                value={kabupatenList.find(
+                    (item) => item.value === form.kabupaten,
+                )}
                 onChange={(selectedOption) => {
                     handleChange("kabupaten", selectedOption.value);
                     fetchKecamatan(selectedOption.value);
                 }}
                 isLoading={isLoading.kabupaten}
-                placeholder={isLoading.kabupaten ? "Memuat..." : "Pilih Kabupaten / Kota"}
+                placeholder={
+                    isLoading.kabupaten ? "Memuat..." : "Pilih Kabupaten / Kota"
+                }
                 className="mb-4"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Kecamatan</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Kecamatan
+            </label>
             <Select
                 options={kecamatanList}
-                value={kecamatanList.find((item) => item.value === form.kecamatan)}
+                value={kecamatanList.find(
+                    (item) => item.value === form.kecamatan,
+                )}
                 onChange={(selectedOption) => {
                     handleChange("kecamatan", selectedOption.value);
                     fetchKelurahan(selectedOption.value);
                 }}
                 isLoading={isLoading.kecamatan}
-                placeholder={isLoading.kecamatan ? "Memuat..." : "Pilih Kecamatan"}
+                placeholder={
+                    isLoading.kecamatan ? "Memuat..." : "Pilih Kecamatan"
+                }
                 isDisabled={!form.kabupaten || isLoading.kecamatan}
                 className="mb-4"
             />
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Kelurahan / Desa</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Kelurahan / Desa
+            </label>
             <Select
                 options={kelurahanList}
-                value={kelurahanList.find((item) => item.value === form.kelurahan)}
+                value={kelurahanList.find(
+                    (item) => item.value === form.kelurahan,
+                )}
                 onChange={(selectedOption) =>
                     handleChange("kelurahan", selectedOption.value)
                 }
                 isLoading={isLoading.kelurahan}
-                placeholder={isLoading.kelurahan ? "Memuat..." : "Pilih Kelurahan / Desa"}
+                placeholder={
+                    isLoading.kelurahan ? "Memuat..." : "Pilih Kelurahan / Desa"
+                }
                 isDisabled={!form.kecamatan || isLoading.kelurahan}
                 className="mb-4"
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">RW</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        RW
+                    </label>
                     <input
                         name="rw"
                         value={form.rw}
@@ -156,7 +175,9 @@ export default function FormTempatTinggal({ setStep }) {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">RT</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        RT
+                    </label>
                     <input
                         name="rt"
                         value={form.rt}
@@ -167,7 +188,9 @@ export default function FormTempatTinggal({ setStep }) {
                 </div>
             </div>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Alamat Lengkap
+            </label>
             <textarea
                 name="alamat"
                 value={form.alamat}

@@ -7,7 +7,7 @@ import Image from "next/image";
 import TitleForm from "../components/TitleForm";
 import Button from "../components/Button";
 
-export default function FormDataUsaha({ setStep }) {
+export default function FormDataUsaha({ setStep, allFormData }) {
     const [jenisUsahaOptions, setJenisUsahaOptions] = useState([]);
     const [form, setForm] = useState({
         jenisUsahaId: "",
@@ -56,29 +56,14 @@ export default function FormDataUsaha({ setStep }) {
             ...prev,
             file: null,
             fileName: "",
-            filePreview: null, // Hapus URL preview
+            filePreview: null,
         }));
     };
 
-    const handleSubmit = async (e) => {
+    // Tambahkan handleSubmit agar tidak error saat submit form
+    const handleSubmit = (e) => {
         e.preventDefault();
-
-        const formData = new FormData();
-        formData.append("jenisUsahaId", form.jenisUsahaId);
-        formData.append("produkUsaha", form.produkUsaha);
-        formData.append("file", form.file);
-
-        const response = await fetch("/api/upload", {
-            method: "POST",
-            body: formData,
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            alert("Data berhasil disimpan!");
-        } else {
-            alert(`Terjadi kesalahan: ${result.message}`);
-        }
+        // Tidak melakukan submit ke database di sini, hanya mencegah reload
     };
 
     return (
@@ -121,8 +106,8 @@ export default function FormDataUsaha({ setStep }) {
                     <Image
                         src={form.filePreview}
                         alt="Preview"
-                        width={500} // Tentukan lebar gambar
-                        height={300} // Tentukan tinggi gambar
+                        width={500}
+                        height={300}
                         className="rounded-lg mb-2"
                     />
                     <p className="text-sm text-gray-700">

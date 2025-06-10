@@ -11,17 +11,7 @@ const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 );
 
-export default function FormDataSiswa({ setStep }) {
-    const [form, setForm] = useState({
-        namaLengkap: "",
-        nik: "",
-        nomorKK: "",
-        tempatLahir: "",
-        tanggalLahir: "",
-        jenisKelamin: "",
-        agama: "",
-    });
-
+export default function FormDataSiswa({ setStep, form, setForm }) {
     const [agamaList, setAgamaList] = useState([]);
     const [loadingAgama, setLoadingAgama] = useState(true); // Tambahkan state loading
 
@@ -60,7 +50,7 @@ export default function FormDataSiswa({ setStep }) {
             </label>
             <input
                 name="namaLengkap"
-                value={form.namaLengkap}
+               value={form.namaLengkap || ""}
                 onChange={handleChange}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                 placeholder="Masukkan nama lengkap"
@@ -72,7 +62,7 @@ export default function FormDataSiswa({ setStep }) {
             <input
                 name="nik"
                 type="number"
-                value={form.nik}
+                value={form.nik || ""}
                 onChange={handleChange}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                 placeholder="Masukkan 16 digit NIK"
@@ -84,7 +74,7 @@ export default function FormDataSiswa({ setStep }) {
             <input
                 name="nomorKK"
                 type="number"
-                value={form.nomorKK}
+                value={form.nomorKK || ""}
                 onChange={handleChange}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                 placeholder="Masukkan 16 digit Nomor KK"
@@ -95,7 +85,7 @@ export default function FormDataSiswa({ setStep }) {
             </label>
             <input
                 name="tempatLahir"
-                value={form.tempatLahir}
+                value={form.tempatLahir || ""}
                 onChange={handleChange}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                 placeholder="Masukkan Tempat Lahir"
@@ -106,7 +96,7 @@ export default function FormDataSiswa({ setStep }) {
             </label>
             <input
                 name="tanggalLahir"
-                value={form.tanggalLahir}
+                value={form.tanggalLahir || ""}
                 onChange={handleChange}
                 type="date"
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
@@ -117,7 +107,7 @@ export default function FormDataSiswa({ setStep }) {
             </label>
             <select
                 name="jenisKelamin"
-                value={form.jenisKelamin}
+                value={form.jenisKelamin || ""}
                 onChange={handleChange}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200">
                 <option value="">Pilih Jenis Kelamin</option>
@@ -130,7 +120,7 @@ export default function FormDataSiswa({ setStep }) {
             </label>
             <select
                 name="agama"
-                value={form.agama}
+                value={form.agama || ""}
                 onChange={handleChange}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200">
                 {loadingAgama ? (
