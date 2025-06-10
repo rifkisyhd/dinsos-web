@@ -53,7 +53,7 @@ export default function FormDataSiswa({ setStep }) {
 
     return (
         <form className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-            <TitleForm blok=" Blok 1 - Data Diri Calon Siswa" />
+            <TitleForm blok=" Blok 2 - Data Diri Calon Siswa" />
 
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nama Lengkap
@@ -147,9 +147,9 @@ export default function FormDataSiswa({ setStep }) {
                 )}
             </select>
 
-            {/* Area Tombol yang sudah diperbaiki */}
-            <div className="flex justify-end mt-6">
-                <Button label="Selanjutnya" onClick={() => setStep(2)} />
+<div className="flex justify-beetween mt-6 gap-8">
+                <Button label="Sebelumnya" onClick={() => setStep(1)} />
+                <Button label="Selanjutnya" onClick={() => setStep(3)} />
             </div>
         </form>
     );

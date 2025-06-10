@@ -85,7 +85,7 @@ export default function FormDataUsaha({ setStep }) {
         <form
             className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100"
             onSubmit={handleSubmit}>
-            <TitleForm blok=" Blok 5 - Data Usaha (Optional/Tidak Wajib Diisi) " />
+            <TitleForm blok=" Blok 6 - Data Usaha (Optional/Tidak Wajib Diisi) " />
 
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Jenis Usaha
@@ -155,11 +155,11 @@ export default function FormDataUsaha({ setStep }) {
             )}
             <p className="text-sm text-red-500 mb-4">Maksimal 2 Mb</p>
 
-            <div className="flex justify-between mt-6">
+            <div className="flex justify-between mt-6 gap-8">
                 <Button
                     label="Sebelumnya"
                     type="button"
-                    onClick={() => setStep(4)}
+                    onClick={() => setStep(5)}
                     className="bg-gray-500 text-white px-4 py-2 rounded"
                 />
                 <Button
@@ -169,7 +169,8 @@ export default function FormDataUsaha({ setStep }) {
                 />
                 <Button
                     label="Selanjutnya"
-                    type="submit"
+                    type="button"
+                    onClick={() => setStep(7)}
                     className="bg-blue-500 text-white px-4 py-2 rounded"
                 />
             </div>

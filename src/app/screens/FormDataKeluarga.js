@@ -71,7 +71,7 @@ export default function FormDataKeluarga({ setStep }) {
     return (
         <form className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
             
-             <TitleForm blok=" Blok 3 - Data Keluarga" />
+             <TitleForm blok=" Blok 4 - Data Keluarga" />
 
             <label className="block text-sm font-medium text-gray-700 mb-1">Ayah</label>
             <input
@@ -177,9 +177,9 @@ export default function FormDataKeluarga({ setStep }) {
             />
 
             {/* Area Tombol yang sudah responsif */}
-            <div className="flex justify-between mt-6">
-                <Button label="Sebelumnya" onClick={() => setStep(2)} />
-                <Button label="Selanjutnya" onClick={() => setStep(4)} />
+            <div className="flex justify-between mt-6 gap-8"> 
+                <Button label="Sebelumnya" onClick={() => setStep(3)} />
+                <Button label="Selanjutnya" onClick={() => setStep(5)} />
             </div>
         </form>
     );

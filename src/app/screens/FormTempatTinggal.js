@@ -94,7 +94,7 @@ export default function FormTempatTinggal({ setStep }) {
     return (
         <form className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
             
-              <TitleForm blok=" Blok 2 - Tempat Tinggal Siswa" />
+              <TitleForm blok=" Blok 3 - Tempat Tinggal Siswa" />
 
             <label className="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
             <Select
@@ -178,9 +178,9 @@ export default function FormTempatTinggal({ setStep }) {
             />
 
             {/* Area Tombol yang sudah diperbaiki */}
-            <div className="flex justify-between mt-6">
-                <Button label="Sebelumnya" onClick={() => setStep(1)} />
-                <Button label="Selanjutnya" onClick={() => setStep(3)} />
+            <div className="flex justify-between mt-6 gap-8">
+                <Button label="Sebelumnya" onClick={() => setStep(2)} />
+                <Button label="Selanjutnya" onClick={() => setStep(4)} />
             </div>
         </form>
     );
