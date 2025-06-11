@@ -7,15 +7,8 @@ import Image from "next/image";
 import TitleForm from "../components/TitleForm";
 import Button from "../components/Button";
 
-export default function FormDataUsaha({ setStep, allFormData }) {
+export default function FormDataUsaha({ setStep, form, setForm, allFormData }) {
     const [jenisUsahaOptions, setJenisUsahaOptions] = useState([]);
-    const [form, setForm] = useState({
-        jenisUsahaId: "",
-        produkUsaha: "",
-        file: null,
-        fileName: "",
-        filePreview: null, // Untuk menyimpan URL preview gambar
-    });
 
     useEffect(() => {
         const fetchJenisUsaha = async () => {

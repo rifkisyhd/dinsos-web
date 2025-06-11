@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import Swal from "sweetalert2";
 
 import FormPetugas from "./screens/FormPetugas";
 import FormDataSiswa from "./screens/FormDataSiswa";
@@ -17,16 +18,20 @@ export default function Page() {
 
     // State untuk setiap form
     const [formSiswa, setFormSiswa] = useState({});
-    const [formTempatTinggal, setFormTempatTinggal] = useState({});
+    const [formTempatTinggal, setFormTempatTinggal] = useState({
+        provinsi: "35",
+    });
     const [formKeluarga, setFormKeluarga] = useState({});
     const [formAset, setFormAset] = useState({});
     const [formUsaha, setFormUsaha] = useState({});
     const [formInfoTambahan, setFormInfoTambahan] = useState({});
     const [formDokumen, setFormDokumen] = useState({});
     const [formCatatan, setFormCatatan] = useState({});
+    const [formPetugas, setFormPetugas] = useState({});
 
     // Gabungkan semua data form
     const allFormData = {
+        ...formPetugas,
         ...formSiswa,
         ...formTempatTinggal,
         ...formKeluarga,
@@ -56,6 +61,19 @@ export default function Page() {
             status_tanah: finalData.statusTanah,
             sumber_penerangan: finalData.sumberPenerangan,
             jumlah_tanggungan: finalData.jumlahTanggungan,
+            jenis_usaha: finalData.jenisUsahaId,
+            produk_usaha: finalData.produkUsaha,
+            foto_produk: finalData.fileName,
+            foto_siswa: finalData.fotoSiswa, // sudah berupa string path
+            foto_orang_tua: finalData.fotoOrangTua,
+            foto_rumah_depan: finalData.fotoRumahDepan,
+            foto_rumah_dalam: finalData.fotoRumahDalam,
+            foto_rumah_samping: finalData.fotoRumahSamping,
+            surat_pernyataan: finalData.suratPernyataan,
+            sktm: finalData.sktm,
+            nama_petugas: finalData.namaPetugas,
+            nomor_hp_petugas: finalData.nomorHpPetugas,
+            lokasi: finalData.lokasi,
         };
         delete mappedData.idListrik;
         delete mappedData.luasRumah;
@@ -69,24 +87,51 @@ export default function Page() {
         delete mappedData.statusTanah;
         delete mappedData.sumberPenerangan;
         delete mappedData.jumlahTanggungan;
+        delete mappedData.jenisUsahaId;
+        delete mappedData.produkUsaha;
+        delete mappedData.fileName;
+        delete mappedData.file;
+        delete mappedData.filePreview;
+        delete mappedData.namaPetugas;
+        delete mappedData.nomorHpPetugas;
+        delete mappedData.lokasi;
+        delete mappedData.catatan;
         try {
             const { error } = await supabase
                 .from("tb_input")
                 .insert(mappedData);
             if (error) {
-                alert("Gagal simpan data: " + error.message);
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal simpan data",
+                    text: error.message,
+                });
             } else {
-                alert("Data berhasil disimpan ke database!");
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: "Data berhasil disimpan ke database!",
+                });
                 setStep(1);
             }
         } catch (err) {
-            alert("Terjadi error: " + err.message);
+            Swal.fire({
+                icon: "error",
+                title: "Terjadi error",
+                text: err.message,
+            });
         }
     };
 
     return (
         <>
-            {step === 1 && <FormPetugas setStep={setStep} step={step} />}
+            {step === 1 && (
+                <FormPetugas
+                    setStep={setStep}
+                    form={formPetugas}
+                    setForm={setFormPetugas}
+                />
+            )}
             {step === 2 && (
                 <FormDataSiswa
                     setStep={setStep}

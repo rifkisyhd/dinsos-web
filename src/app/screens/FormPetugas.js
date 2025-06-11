@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import Swal from "sweetalert2";
 
 import Button from "../components/Button";
 import Link from "next/link";
@@ -14,13 +15,7 @@ const Select = dynamic(() => import("react-select"), {
     ),
 });
 
-export default function FormPetugas({ setStep }) {
-    const [form, setForm] = useState({
-        petugas: "",
-        namaPetugas: "",
-        nomorHpPetugas: "",
-        lokasi: "",
-    });
+export default function FormPetugas({ setStep, form, setForm }) {
     const [pernyataanBenar, setPernyataanBenar] = useState(false);
 
     const [petugasOptions, setPetugasOptions] = useState([]);
@@ -59,7 +54,11 @@ export default function FormPetugas({ setStep }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!pernyataanBenar) {
-            alert("Anda harus menyetujui pernyataan untuk melanjutkan.");
+            Swal.fire({
+                icon: "warning",
+                title: "Pernyataan harus disetujui",
+                text: "Anda harus menyetujui pernyataan untuk melanjutkan.",
+            });
             return;
         }
         console.log("Data Petugas:", form);
@@ -98,8 +97,12 @@ export default function FormPetugas({ setStep }) {
                 Nama Petugas
             </label>
             <input
+                type="text"
                 name="namaPetugas"
-                onChange={(e) => handleChange("namaPetugas", e.target.value)}
+                value={form.namaPetugas || ""}
+                onChange={(e) =>
+                    setForm((f) => ({ ...f, namaPetugas: e.target.value }))
+                }
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4"
             />
 
@@ -107,9 +110,12 @@ export default function FormPetugas({ setStep }) {
                 Nomor HP Petugas
             </label>
             <input
+                type="text"
                 name="nomorHpPetugas"
-                type="tel"
-                onChange={(e) => handleChange("nomorHpPetugas", e.target.value)}
+                value={form.nomorHpPetugas || ""}
+                onChange={(e) =>
+                    setForm((f) => ({ ...f, nomorHpPetugas: e.target.value }))
+                }
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4"
                 placeholder="Contoh: 08123456789"
             />
@@ -122,7 +128,13 @@ export default function FormPetugas({ setStep }) {
                 options={lokasiOptions}
                 isLoading={isLoading.lokasi}
                 placeholder={isLoading.lokasi ? "Memuat..." : "Pilih Lokasi"}
-                onChange={(option) => handleChange("lokasi", option.value)}
+                value={
+                    lokasiOptions.find((opt) => opt.value === form.lokasi) ||
+                    null
+                }
+                onChange={(opt) =>
+                    setForm((f) => ({ ...f, lokasi: opt ? opt.value : "" }))
+                }
                 className="mb-4"
             />
 

@@ -87,8 +87,7 @@ export default function FormTempatTinggal({ setStep, form, setForm }) {
 
     return (
         <form className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-            
-              <TitleForm blok=" Blok 3 - Tempat Tinggal Siswa" />
+            <TitleForm blok=" Blok 3 - Tempat Tinggal Siswa" />
 
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Provinsi
@@ -168,7 +167,7 @@ export default function FormTempatTinggal({ setStep, form, setForm }) {
                     </label>
                     <input
                         name="rw"
-                        value={form.rw}
+                        value={form.rw || ""}
                         onChange={(e) => handleChange("rw", e.target.value)}
                         className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                         placeholder="Contoh: 005"
@@ -180,7 +179,7 @@ export default function FormTempatTinggal({ setStep, form, setForm }) {
                     </label>
                     <input
                         name="rt"
-                        value={form.rt}
+                        value={form.rt || ""}
                         onChange={(e) => handleChange("rt", e.target.value)}
                         className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                         placeholder="Contoh: 001"
@@ -193,7 +192,7 @@ export default function FormTempatTinggal({ setStep, form, setForm }) {
             </label>
             <textarea
                 name="alamat"
-                value={form.alamat}
+                value={form.alamat || ""}
                 onChange={(e) => handleChange("alamat", e.target.value)}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                 placeholder="Masukkan nama jalan, nomor rumah, atau patokan lainnya"
