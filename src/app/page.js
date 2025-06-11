@@ -94,8 +94,12 @@ export default function Page() {
         delete mappedData.filePreview;
         delete mappedData.namaPetugas;
         delete mappedData.nomorHpPetugas;
-        delete mappedData.lokasi;
-        delete mappedData.catatan;
+        delete mappedData.fotoRumahDalam;
+        delete mappedData.fotoRumahDepan;
+        delete mappedData.fotoRumahSamping;
+        delete mappedData.fotoSiswa;
+        delete mappedData.suratPernyataan;
+        delete mappedData.fotoOrangTua;
         try {
             const { error } = await supabase
                 .from("tb_input")

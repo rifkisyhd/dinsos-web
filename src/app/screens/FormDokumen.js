@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "../components/Button";
-import FileInput from "../components/FileInput"; // <-- Import komponen baru kita
+import FileInput from "../components/FileInput";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function FormDokumen({ setStep, form, setForm }) {
@@ -27,10 +27,8 @@ export default function FormDokumen({ setStep, form, setForm }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { file } = form.fotoSiswa;
-        const { data, error } = await supabase.storage
-            .from("uploads")
-            .upload(`foto_siswa/${file.name}`, file);
+        console.log("Data dokumen yang sudah di-upload:", form);
+        setStep(9); // lanjut step
     };
 
     return (
