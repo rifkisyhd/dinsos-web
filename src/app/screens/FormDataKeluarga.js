@@ -84,7 +84,7 @@ export default function FormDataKeluarga({ setStep, form, setForm }) {
             </label>
             <input
                 name="ibu"
-                value={form.ibu}
+                value={form.ibu || ""}
                 onChange={(e) => handleChange("ibu", e.target.value)}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                 placeholder="Masukkan nama ibu"
@@ -139,7 +139,7 @@ export default function FormDataKeluarga({ setStep, form, setForm }) {
             </label>
             <input
                 name="wali"
-                value={form.wali}
+                value={form.wali || ""}
                 onChange={(e) => handleChange("wali", e.target.value)}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                 placeholder="Masukkan nama wali (opsional)"

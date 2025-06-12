@@ -34,12 +34,15 @@ export default function FormDataUsaha({ setStep, form, setForm, allFormData }) {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const filePreview = URL.createObjectURL(file); // Buat URL preview
+            if (file.size > 2 * 1024 * 1024) {
+                alert("File terlalu besar! Maksimal 2MB");
+                return;
+            }
             setForm((prev) => ({
                 ...prev,
-                file: file,
+                fotoProduk: file, // Changed to match the field name
                 fileName: file.name,
-                filePreview: filePreview,
+                filePreview: URL.createObjectURL(file),
             }));
         }
     };

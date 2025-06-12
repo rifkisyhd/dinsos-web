@@ -11,51 +11,86 @@ const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 );
 
+// Helper function untuk membuat key yang aman untuk state dari nama bantuan
+const generateKeyFromName = (name) => {
+    return name.replace(/\s+/g, "_").toLowerCase();
+};
+
 export default function FormDataSiswa({ setStep, form, setForm }) {
+    // State untuk data dari database
     const [agamaList, setAgamaList] = useState([]);
-    const [loadingAgama, setLoadingAgama] = useState(true); // Tambahkan state loading
+    const [jenjangList, setJenjangList] = useState([]);
+    const [kondisiFisikList, setKondisiFisikList] = useState([]);
+    const [bansosList, setBansosList] = useState([]);
+
+    // State untuk status loading
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchAgama = async () => {
+        const fetchData = async () => {
             try {
-                const { data, error } = await supabase
-                    .from("agama")
-                    .select("*");
-                if (error) throw error;
-                setAgamaList(data);
+                // Mengambil semua data secara bersamaan
+                const [agamaRes, jenjangRes, kondisiFisikRes, bansosRes] =
+                    await Promise.all([
+                        supabase.from("agama").select("*"),
+                        supabase.from("jenjang").select("*"),
+                        supabase.from("kondisi_fisik").select("*"),
+                        supabase.from("bansos").select("*"),
+                    ]);
+
+                if (agamaRes.error) throw agamaRes.error;
+                if (jenjangRes.error) throw jenjangRes.error;
+                if (kondisiFisikRes.error) throw kondisiFisikRes.error;
+                if (bansosRes.error) throw bansosRes.error;
+
+                setAgamaList(agamaRes.data);
+                setJenjangList(jenjangRes.data);
+                setKondisiFisikList(kondisiFisikRes.data);
+                setBansosList(bansosRes.data);
             } catch (error) {
-                console.error("Error fetching agama:", error.message);
+                console.error("Error fetching data:", error.message);
             } finally {
-                setLoadingAgama(false); // Set loading ke false setelah selesai
+                setLoading(false);
             }
         };
 
-        fetchAgama();
+        fetchData();
     }, []);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        const { name, value, type, checked } = e.target;
+
+        if (type === "checkbox") {
+            setForm((prev) => ({
+                ...prev,
+                bansos: {
+                    ...(prev.bansos || {}), // ensure bansos exists
+                    [name]: checked,
+                },
+            }));
+        } else {
+            setForm((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
     };
 
     return (
         <form className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
             <TitleForm blok=" Blok 2 - Data Diri Calon Siswa" />
 
+            {/* Input Nama Lengkap sampai Jenis Kelamin (tidak berubah) */}
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nama Lengkap
             </label>
             <input
                 name="namaLengkap"
-               value={form.namaLengkap || ""}
+                value={form.namaLengkap || ""}
                 onChange={handleChange}
-                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4"
                 placeholder="Masukkan nama lengkap"
             />
-
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 NIK
             </label>
@@ -64,10 +99,9 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                 type="number"
                 value={form.nik || ""}
                 onChange={handleChange}
-                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4"
                 placeholder="Masukkan 16 digit NIK"
             />
-
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nomor KK
             </label>
@@ -76,10 +110,9 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                 type="number"
                 value={form.nomorKK || ""}
                 onChange={handleChange}
-                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4"
                 placeholder="Masukkan 16 digit Nomor KK"
             />
-
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Tempat Lahir
             </label>
@@ -87,10 +120,9 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                 name="tempatLahir"
                 value={form.tempatLahir || ""}
                 onChange={handleChange}
-                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4"
                 placeholder="Masukkan Tempat Lahir"
             />
-
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Tanggal Lahir
             </label>
@@ -99,9 +131,8 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                 value={form.tanggalLahir || ""}
                 onChange={handleChange}
                 type="date"
-                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4"
             />
-
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Jenis Kelamin
             </label>
@@ -109,7 +140,7 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                 name="jenisKelamin"
                 value={form.jenisKelamin || ""}
                 onChange={handleChange}
-                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200">
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4">
                 <option value="">Pilih Jenis Kelamin</option>
                 <option value="Laki-laki">Laki-laki</option>
                 <option value="Perempuan">Perempuan</option>
@@ -122,22 +153,140 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                 name="agama"
                 value={form.agama || ""}
                 onChange={handleChange}
-                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200">
-                {loadingAgama ? (
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4">
+                {loading ? (
                     <option>Memuat...</option>
                 ) : (
                     <>
-                        <option value="">Pilih Agama</option>
+                        {" "}
+                        <option value="">Pilih Agama</option>{" "}
                         {agamaList.map((item) => (
                             <option key={item.id} value={item.nama}>
                                 {item.nama}
                             </option>
-                        ))}
+                        ))}{" "}
                     </>
                 )}
             </select>
 
-<div className="flex justify-beetween mt-6 gap-8">
+            <div className="flex items-center gap-4 mb-4">
+                <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Anak Ke-
+                    </label>
+                    <input
+                        name="anakKe"
+                        type="number"
+                        value={form.anakKe || ""}
+                        onChange={handleChange}
+                        className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                        placeholder="Anak Ke-"
+                    />
+                </div>
+                <span className="mt-7">Dari</span>
+                <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        &nbsp;
+                    </label>
+                    <input
+                        name="dariSaudara"
+                        type="number"
+                        value={form.dariSaudara || ""}
+                        onChange={handleChange}
+                        className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                        placeholder="... Saudara"
+                    />
+                </div>
+            </div>
+
+            {/* --- KODE YANG DIPERBARUI DARI DATABASE --- */}
+
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Jenjang yang dipilih
+            </label>
+            <select
+                name="jenjang"
+                value={form.jenjang || ""}
+                onChange={handleChange}
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4">
+                {loading ? (
+                    <option>Memuat...</option>
+                ) : (
+                    <>
+                        {" "}
+                        <option value="">Pilih Jenjang</option>{" "}
+                        {jenjangList.map((item) => (
+                            <option key={item.id} value={item.nama}>
+                                {item.nama}
+                            </option>
+                        ))}{" "}
+                    </>
+                )}
+            </select>
+
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Kondisi Fisik
+            </label>
+            <select
+                name="kondisiFisik"
+                value={form.kondisiFisik || ""}
+                onChange={handleChange}
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4">
+                {loading ? (
+                    <option>Memuat...</option>
+                ) : (
+                    <>
+                        {" "}
+                        <option value="">Pilih Kondisi Fisik</option>{" "}
+                        {kondisiFisikList.map((item) => (
+                            <option key={item.id} value={item.nama}>
+                                {item.nama}
+                            </option>
+                        ))}{" "}
+                    </>
+                )}
+            </select>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Bansos Yang Diterima
+                </label>
+                {loading ? (
+                    <p className="text-sm text-gray-500">
+                        Memuat opsi bantuan...
+                    </p>
+                ) : (
+                    <div className="space-y-2">
+                        {bansosList.map((option) => {
+                            const key = generateKeyFromName(option.nama);
+                            return (
+                                <div
+                                    key={option.id}
+                                    className="flex items-center">
+                                    <input
+                                        id={key}
+                                        name={key}
+                                        type="checkbox"
+                                        checked={form.bansos?.[key] || false}
+                                        onChange={handleChange}
+                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    />
+                                    <label
+                                        htmlFor={key}
+                                        className="ml-2 block text-sm text-gray-900">
+                                        {option.nama}
+                                    </label>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+                <p className="text-xs text-red-500 mt-2">
+                    Anda harus memilih setidaknya satu opsi.
+                </p>
+            </div>
+
+            <div className="flex justify-between mt-6 gap-8">
                 <Button label="Sebelumnya" onClick={() => setStep(1)} />
                 <Button label="Selanjutnya" onClick={() => setStep(3)} />
             </div>

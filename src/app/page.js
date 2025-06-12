@@ -53,15 +53,21 @@ export default function Page() {
             // Upload file satu per satu jika ada
             const uploadFile = async (name, file) => {
                 if (!file) return "";
-                const { data, error } = await supabase.storage
-                    .from(process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "uploads")
-                    .upload(`${name}/${Date.now()}_${file.name}`, file, {
-                        upsert: true,
-                    });
-                if (error) {
-                    throw new Error(error.message);
+                try {
+                    const { data, error } = await supabase.storage
+                        .from(
+                            process.env.NEXT_PUBLIC_SUPABASE_BUCKET ||
+                                "uploads",
+                        )
+                        .upload(`${name}/${Date.now()}_${file.name}`, file, {
+                            upsert: true,
+                        });
+                    if (error) throw new Error(error.message);
+                    return data.path;
+                } catch (error) {
+                    console.error(`Error uploading ${name}:`, error);
+                    throw error;
                 }
-                return data.path;
             };
 
             // Upload semua file dokumen
@@ -95,14 +101,13 @@ export default function Page() {
             const mappedData = {
                 // Data siswa & keluarga
                 nama_lengkap: finalData.namaLengkap,
-                nama: finalData.nama,
                 nik: finalData.nik,
-                no_kk: finalData.noKk,
-                nomor_kk: finalData.nomorKk,
+                nomor_kk: finalData.nomorKK,
                 tempat_lahir: finalData.tempatLahir,
                 tanggal_lahir: finalData.tanggalLahir,
                 jenis_kelamin: finalData.jenisKelamin,
                 alamat: finalData.alamat,
+                kondisi_fisik: finalData.kondisiFisik, // Add this line to map kondisi_fisik
                 provinsi: finalData.provinsi,
                 kabupaten: finalData.kabupaten,
                 kecamatan: finalData.kecamatan,
@@ -136,7 +141,11 @@ export default function Page() {
                 // Data usaha
                 jenis_usaha: finalData.jenisUsahaId,
                 produk_usaha: finalData.produkUsaha,
-                foto_produk: await uploadFile("fotoProduk", dokumen.fotoProduk),
+                foto_produk: await uploadFile(
+                    // Changed to match DB column name
+                    "fotoProduk",
+                    dokumen.fotoProduk, // Make sure this matches form field
+                ),
 
                 // Path dokumen
                 foto_siswa: fotoSiswaPath,
@@ -148,10 +157,17 @@ export default function Page() {
                 sktm: sktmPath,
 
                 // Data petugas
+                petugas: finalData.petugas, // Sesuaikan dengan nama kolom di db
                 nama_petugas: finalData.namaPetugas,
                 nomor_hp_petugas: finalData.nomorHpPetugas,
                 lokasi: finalData.lokasi,
                 catatan: finalData.catatan,
+
+                // Transform bansos from object to string
+                bansos: Object.entries(finalData.bansos || {})
+                    .filter(([_, value]) => value) // only get selected bansos
+                    .map(([key]) => key.split("_").join(" ")) // convert key back to readable text
+                    .join(", "), // join with comma
             };
 
             // Insert ke database

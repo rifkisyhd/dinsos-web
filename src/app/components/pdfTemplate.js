@@ -37,11 +37,13 @@ export const generateAssessmentPDF = async (data, options = {}) => {
         fotoRumahDepanUrl,
         fotoRumahSampingUrl,
         fotoRumahDalamUrl,
+        fotoProdukUrl,
     ] = await Promise.all([
         loadImage(storageUrl(data.foto_siswa)),
         loadImage(storageUrl(data.foto_rumah_depan)),
         loadImage(storageUrl(data.foto_rumah_dalam)),
         loadImage(storageUrl(data.foto_rumah_samping)),
+        loadImage(storageUrl(data.foto_produk)),
     ]);
 
     console.log("📄 Images loaded, generating PDF...");
@@ -68,13 +70,13 @@ export const generateAssessmentPDF = async (data, options = {}) => {
                 <div style="margin-top:8px;">
                     <table style="width:100%; border-collapse:collapse; font-size:10px;">
                         <tr><td style="padding:2px;">Nama</td><td style="padding:2px;">: ${
-                            data.nama || "-"
+                            data.nama_lengkap || "-"
                         }</td></tr>
                         <tr><td style="padding:2px;">NIK</td><td style="padding:2px;">: ${
                             data.nik || "-"
                         }</td></tr>
                         <tr><td style="padding:2px;">No KK</td><td style="padding:2px;">: ${
-                            data.no_kk || "-"
+                            data.nomor_kk || "-"
                         }</td></tr>
                         <tr><td style="padding:2px;">Tempat, tanggal lahir</td><td style="padding:2px;">: ${
                             data.tempat_lahir || "-"
@@ -89,8 +91,8 @@ export const generateAssessmentPDF = async (data, options = {}) => {
                         <tr><td style="padding:2px;">Agama</td><td style="padding:2px;">: ${
                             data.agama || "-"
                         }</td></tr>
-                        <tr><td style="padding:2px;">Fisik</td><td style="padding:2px;">: ${
-                            data.fisik || "-"
+                        <tr><td style="padding:2px;">Kondisi Fisik</td><td style="padding:2px;">: ${
+                            data.kondisi_fisik || "-"
                         }</td></tr>
                         <tr><td style="padding:2px;">Masuk DTSEN desil ke</td><td style="padding:2px;">: ${
                             data.desil || "-"
@@ -142,6 +144,18 @@ export const generateAssessmentPDF = async (data, options = {}) => {
                     </table>
                 </div>
 
+                <div style="margin-top:8px;">
+                    ${
+                        fotoProdukUrl
+                            ? `<img src="${fotoProdukUrl}" 
+                               style="max-width:80px; max-height:60px; display:block; border:1px solid #ccc;" />`
+                            : `<div style="width:80px; height:60px; background:#f0f0f0; border:1px solid #ccc; 
+                                 display:flex; align-items:center; justify-content:center; font-size:9px;">
+                                 No Product Image
+                               </div>`
+                    }
+                </div>
+
                 <div style="margin-top:8px; font-size:10px;">
                     <b>Catatan Petugas:</b>
                     <div style="border:1px solid #ccc; padding:4px; min-height:40px;">
@@ -152,12 +166,14 @@ export const generateAssessmentPDF = async (data, options = {}) => {
                 <div style="margin-top:12px; font-size:10px;">
                     <table style="width:100%; border-collapse:collapse;">
                         <tr>
-                            <td style="padding:2px;">Nama petugas</td><td style="padding:2px;">: ${
-                                data.nama_petugas || "-"
+                            <td style="padding:2px;">Petugas</td>
+                            <td style="padding:2px;">: ${
+                                data.petugas || "-"
                             }</td>
                         </tr>
                         <tr>
-                            <td style="padding:2px;">No HP</td><td style="padding:2px;">: ${
+                            <td style="padding:2px;">No. HP Petugas</td>
+                            <td style="padding:2px;">: ${
                                 data.nomor_hp_petugas || "-"
                             }</td>
                         </tr>
