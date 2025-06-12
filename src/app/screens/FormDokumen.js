@@ -5,22 +5,13 @@ import FileInput from "../components/FileInput";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function FormDokumen({ setStep, form, setForm }) {
-    const handleFileChange = async (e) => {
+    const handleFileChange = (e) => {
         const { name } = e.target;
         const file = e.target.files[0];
         if (file) {
-            // Upload langsung ke Supabase Storage
-            const { data, error } = await supabase.storage
-                .from("uploads")
-                .upload(`${name}/${file.name}`, file, { upsert: true });
-            if (error) {
-                alert("Upload gagal: " + error.message);
-                return;
-            }
-            // Simpan hanya path hasil upload ke state
             setForm((prev) => ({
                 ...prev,
-                [name]: data.path,
+                [name]: file, // simpan file object, bukan path
             }));
         }
     };
@@ -50,49 +41,91 @@ export default function FormDokumen({ setStep, form, setForm }) {
                 label="Foto calon siswa"
                 fileType="JPG,PNG"
                 name="fotoSiswa"
-                fileName={form.fotoSiswa?.split("/").pop() || ""}
+                fileName={
+                    form.fotoSiswa?.name ||
+                    (typeof form.fotoSiswa === "string"
+                        ? form.fotoSiswa.split("/").pop()
+                        : "") ||
+                    ""
+                }
                 onChange={handleFileChange}
             />
             <FileInput
                 label="Foto orang tua"
                 fileType="JPG,PNG"
                 name="fotoOrangTua"
-                fileName={form.fotoOrangTua?.split("/").pop() || ""}
+                fileName={
+                    form.fotoOrangTua?.name ||
+                    (typeof form.fotoOrangTua === "string"
+                        ? form.fotoOrangTua.split("/").pop()
+                        : "") ||
+                    ""
+                }
                 onChange={handleFileChange}
             />
             <FileInput
                 label="Foto Rumah Tampak Depan"
                 fileType="JPG,PNG"
                 name="fotoRumahDepan"
-                fileName={form.fotoRumahDepan?.split("/").pop() || ""}
+                fileName={
+                    form.fotoRumahDepan?.name ||
+                    (typeof form.fotoRumahDepan === "string"
+                        ? form.fotoRumahDepan.split("/").pop()
+                        : "") ||
+                    ""
+                }
                 onChange={handleFileChange}
             />
             <FileInput
                 label="Foto Rumah Tampak Dalam"
                 fileType="JPG,PNG"
                 name="fotoRumahDalam"
-                fileName={form.fotoRumahDalam?.split("/").pop() || ""}
+                fileName={
+                    form.fotoRumahDalam?.name ||
+                    (typeof form.fotoRumahDalam === "string"
+                        ? form.fotoRumahDalam.split("/").pop()
+                        : "") ||
+                    ""
+                }
                 onChange={handleFileChange}
             />
             <FileInput
                 label="Foto Rumah Tampak Samping"
                 fileType="JPG,PNG"
                 name="fotoRumahSamping"
-                fileName={form.fotoRumahSamping?.split("/").pop() || ""}
+                fileName={
+                    form.fotoRumahSamping?.name ||
+                    (typeof form.fotoRumahSamping === "string"
+                        ? form.fotoRumahSamping.split("/").pop()
+                        : "") ||
+                    ""
+                }
                 onChange={handleFileChange}
             />
             <FileInput
                 label="Surat Pernyataan Orang Tua"
                 fileType="PDF"
                 name="suratPernyataan"
-                fileName={form.suratPernyataan?.split("/").pop() || ""}
+                fileName={
+                    form.suratPernyataan?.name ||
+                    (typeof form.suratPernyataan === "string"
+                        ? form.suratPernyataan.split("/").pop()
+                        : "") ||
+                    ""
+                }
                 onChange={handleFileChange}
             />
             <FileInput
                 label="Surat Keterangan Tidak Mampu (SKTM) - Opsional"
                 fileType="PDF"
                 name="sktm"
-                fileName={form.sktm?.split("/").pop() || ""}
+                fileName={
+                    form.sktm?.name ||
+                    (typeof form.sktm === "string"
+                        ? form.sktm.split("/").pop()
+                        : "") ||
+                    ""
+                }
                 onChange={handleFileChange}
             />
 

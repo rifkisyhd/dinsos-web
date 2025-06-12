@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Swal from "sweetalert2";
+import { generateAssessmentPDF } from "./components/pdfTemplate";
 
 import FormPetugas from "./screens/FormPetugas";
 import FormDataSiswa from "./screens/FormDataSiswa";
@@ -46,7 +47,31 @@ export default function Page() {
     const submitAllData = async (catatanData) => {
         // Gabungkan semua data form dengan catatan terakhir
         const finalData = { ...allFormData, ...catatanData };
-        // Mapping camelCase ke snake_case untuk kolom Supabase
+        const dokumen = allFormData; 
+
+        // Upload file satu per satu jika ada
+        const uploadFile = async (name, file) => {
+            if (!file) return "";
+            const { data, error } = await supabase.storage
+                .from("uploads")
+                .upload(`${name}/${Date.now()}_${file.name}`, file, {
+                    upsert: true,
+                });
+            if (error) {
+                throw new Error(error.message);
+            }
+            return data.path;
+        };
+
+        // Upload semua file dokumen
+        const fotoSiswaPath = await uploadFile("fotoSiswa", dokumen.fotoSiswa);
+        const fotoOrangTuaPath = await uploadFile(
+            "fotoOrangTua",
+            dokumen.fotoOrangTua,
+        );
+        // ...dst untuk semua dokumen...
+
+        // Mapping ke snake_case dan path
         const mappedData = {
             ...finalData,
             id_listrik: finalData.idListrik,
@@ -64,8 +89,8 @@ export default function Page() {
             jenis_usaha: finalData.jenisUsahaId,
             produk_usaha: finalData.produkUsaha,
             foto_produk: finalData.fileName,
-            foto_siswa: finalData.fotoSiswa, // sudah berupa string path
-            foto_orang_tua: finalData.fotoOrangTua,
+            foto_siswa: fotoSiswaPath,
+            foto_orang_tua: fotoOrangTuaPath,
             foto_rumah_depan: finalData.fotoRumahDepan,
             foto_rumah_dalam: finalData.fotoRumahDalam,
             foto_rumah_samping: finalData.fotoRumahSamping,
@@ -115,6 +140,13 @@ export default function Page() {
                     icon: "success",
                     title: "Berhasil",
                     text: "Data berhasil disimpan ke database!",
+                    showCancelButton: true,
+                    confirmButtonText: "Jadi PDF",
+                    cancelButtonText: "Tutup",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        generateAssessmentPDF(mappedData);
+                    }
                 });
                 setStep(1);
             }

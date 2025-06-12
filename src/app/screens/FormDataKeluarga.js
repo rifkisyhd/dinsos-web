@@ -66,15 +66,14 @@ export default function FormDataKeluarga({ setStep, form, setForm }) {
 
     return (
         <form className="w-full max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-            
-             <TitleForm blok=" Blok 4 - Data Keluarga" />
+            <TitleForm blok=" Blok 4 - Data Keluarga" />
 
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Ayah
             </label>
             <input
                 name="ayah"
-                value={form.ayah}
+                value={form.ayah || ""}
                 onChange={(e) => handleChange("ayah", e.target.value)}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4 transition-colors duration-200"
                 placeholder="Masukkan nama ayah"
@@ -126,7 +125,7 @@ export default function FormDataKeluarga({ setStep, form, setForm }) {
             </label>
             <textarea
                 name="penjelasanPekerjaan"
-                value={form.penjelasanPekerjaan}
+                value={form.penjelasanPekerjaan || ""}
                 onChange={(e) =>
                     handleChange("penjelasanPekerjaan", e.target.value)
                 }
@@ -196,7 +195,7 @@ export default function FormDataKeluarga({ setStep, form, setForm }) {
             <input
                 name="nominalPengeluaran"
                 type="number"
-                value={form.nominalPengeluaran}
+                value={form.nominalPengeluaran || ""}
                 onChange={(e) =>
                     handleChange("nominalPengeluaran", e.target.value)
                 }
@@ -219,7 +218,7 @@ export default function FormDataKeluarga({ setStep, form, setForm }) {
             />
 
             {/* Area Tombol yang sudah responsif */}
-            <div className="flex justify-between mt-6 gap-8"> 
+            <div className="flex justify-between mt-6 gap-8">
                 <Button label="Sebelumnya" onClick={() => setStep(3)} />
                 <Button label="Selanjutnya" onClick={() => setStep(5)} />
             </div>
