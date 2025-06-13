@@ -23,11 +23,13 @@ export default function RootLayout({ children }) {
               adalah praktik yang baik untuk kejelasan.
             */}
             <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1.0"
+                />
             </head>
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-            >
+                className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
                 <main className="min-h-screen w-full bg-gray-50 flex items-center justify-center p-4">
                     {children}
                 </main>

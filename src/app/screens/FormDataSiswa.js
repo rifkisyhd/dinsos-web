@@ -215,7 +215,7 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                     />
                 </div>
             </div>
-                -
+                
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Jenjang yang dipilih
             </label>
