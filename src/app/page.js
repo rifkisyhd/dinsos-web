@@ -107,7 +107,7 @@ export default function Page() {
                 tanggal_lahir: finalData.tanggalLahir,
                 jenis_kelamin: finalData.jenisKelamin,
                 alamat: finalData.alamat,
-                kondisi_fisik: finalData.kondisiFisik, // Add this line to map kondisi_fisik
+                kondisi_fisik: finalData.kondisiFisik,
                 provinsi: finalData.provinsi,
                 kabupaten: finalData.kabupaten,
                 kecamatan: finalData.kecamatan,
@@ -119,6 +119,13 @@ export default function Page() {
                 ayah: finalData.ayah,
                 ibu: finalData.ibu,
                 wali: finalData.wali,
+
+                // --- PENAMBAHAN MAPPING DATA BARU ---
+                dtsen_desil: finalData.dtsenDesil,
+                sekolah_asal: finalData.sekolahAsal,
+                bersedia_asrama: finalData.bersediaAsrama,
+                sudah_pernyataan: finalData.sudahPernyataan,
+                // --- AKHIR PENAMBAHAN MAPPING ---
 
                 // Data ekonomi
                 penghasilan: finalData.penghasilan,
@@ -142,9 +149,8 @@ export default function Page() {
                 jenis_usaha: finalData.jenisUsahaId,
                 produk_usaha: finalData.produkUsaha,
                 foto_produk: await uploadFile(
-                    // Changed to match DB column name
                     "fotoProduk",
-                    dokumen.fotoProduk, // Make sure this matches form field
+                    dokumen.fotoProduk,
                 ),
 
                 // Path dokumen
@@ -157,7 +163,7 @@ export default function Page() {
                 sktm: sktmPath,
 
                 // Data petugas
-                petugas: finalData.petugas, // Sesuaikan dengan nama kolom di db
+                petugas: finalData.petugas,
                 nama_petugas: finalData.namaPetugas,
                 nomor_hp_petugas: finalData.nomorHpPetugas,
                 lokasi: finalData.lokasi,
@@ -185,7 +191,7 @@ export default function Page() {
                 title: "Berhasil",
                 text: "Data berhasil disimpan ke database!",
                 showCancelButton: true,
-                confirmButtonText: "Jadi PDF",
+                confirmButtonText: "Lihat Bukti",
                 cancelButtonText: "Tutup",
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -267,4 +273,4 @@ export default function Page() {
             )}
         </>
     );
-}
+}   

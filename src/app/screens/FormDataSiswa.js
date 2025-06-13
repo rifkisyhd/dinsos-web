@@ -22,6 +22,10 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
     const [jenjangList, setJenjangList] = useState([]);
     const [kondisiFisikList, setKondisiFisikList] = useState([]);
     const [bansosList, setBansosList] = useState([]);
+    // --- PENAMBAHAN STATE BARU ---
+    const [bersediaTinggalList, setBersediaTinggalList] = useState([]);
+    const [tandaTanganList, setTandaTanganList] = useState([]);
+    // --- AKHIR PENAMBAHAN STATE BARU ---
 
     // State untuk status loading
     const [loading, setLoading] = useState(true);
@@ -30,23 +34,36 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
         const fetchData = async () => {
             try {
                 // Mengambil semua data secara bersamaan
-                const [agamaRes, jenjangRes, kondisiFisikRes, bansosRes] =
+                // --- TAMBAHKAN FETCH DATA BARU ---
+                const [agamaRes, jenjangRes, kondisiFisikRes, bansosRes, bersediaTinggalRes, tandaTanganRes] =
                     await Promise.all([
                         supabase.from("agama").select("*"),
                         supabase.from("jenjang").select("*"),
                         supabase.from("kondisi_fisik").select("*"),
                         supabase.from("bansos").select("*"),
+                        supabase.from("bersedia_tinggal").select("*"), // Ambil data dari tabel bersedia_tinggal
+                        supabase.from("tanda_tangan").select("*"),    // Ambil data dari tabel tanda_tangan
                     ]);
+                // --- AKHIR PENAMBAHAN FETCH DATA ---
 
                 if (agamaRes.error) throw agamaRes.error;
                 if (jenjangRes.error) throw jenjangRes.error;
                 if (kondisiFisikRes.error) throw kondisiFisikRes.error;
                 if (bansosRes.error) throw bansosRes.error;
+                // --- TAMBAHKAN VALIDASI ERROR ---
+                if (bersediaTinggalRes.error) throw bersediaTinggalRes.error;
+                if (tandaTanganRes.error) throw tandaTanganRes.error;
+                // --- AKHIR VALIDASI ERROR ---
 
                 setAgamaList(agamaRes.data);
                 setJenjangList(jenjangRes.data);
                 setKondisiFisikList(kondisiFisikRes.data);
                 setBansosList(bansosRes.data);
+                // --- TAMBAHKAN SET STATE BARU ---
+                setBersediaTinggalList(bersediaTinggalRes.data);
+                setTandaTanganList(tandaTanganRes.data);
+                // --- AKHIR SET STATE BARU ---
+
             } catch (error) {
                 console.error("Error fetching data:", error.message);
             } finally {
@@ -198,9 +215,7 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                     />
                 </div>
             </div>
-
-            {/* --- KODE YANG DIPERBARUI DARI DATABASE --- */}
-
+                -
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Jenjang yang dipilih
             </label>
@@ -247,6 +262,46 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                 )}
             </select>
 
+            <label className="block text-sm font-medium text-gray-700 mb-1">Masuk DTSEN desil ke</label>
+            <input name="dtsenDesil" type="number" value={form.dtsenDesil || ""} onChange={handleChange} className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4" placeholder="Masukkan desil (jika ada)" />
+
+            <label className="block text-sm font-medium text-gray-700 mb-1">Sekolah Asal</label>
+            <input name="sekolahAsal" value={form.sekolahAsal || ""} onChange={handleChange} className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4" placeholder="Masukkan sekolah asal" />
+
+            {/* --- KODE DIUBAH DI SINI --- */}
+            <label className="block text-sm font-medium text-gray-700 mb-1">Apakah bersedia tinggal di asrama?</label>
+            <select name="bersediaAsrama" value={form.bersediaAsrama || ""} onChange={handleChange} className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4">
+                {loading ? (
+                    <option>Memuat...</option>
+                ) : (
+                    <>
+                        <option value="">Pilih Jawaban</option>
+                        {bersediaTinggalList.map((item) => (
+                            <option key={item.id} value={item.nama}>
+                                {item.nama}
+                            </option>
+                        ))}
+                    </>
+                )}
+            </select>
+
+            <label className="block text-sm font-medium text-gray-700 mb-1">Apakah sudah menandatangani surat pernyataan?</label>
+            <select name="sudahPernyataan" value={form.sudahPernyataan || ""} onChange={handleChange} className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4">
+                {loading ? (
+                    <option>Memuat...</option>
+                ) : (
+                    <>
+                        <option value="">Pilih Jawaban</option>
+                        {tandaTanganList.map((item) => (
+                            <option key={item.id} value={item.nama}>
+                                {item.nama}
+                            </option>
+                        ))}
+                    </>
+                )}
+            </select>
+            {/* --- AKHIR PERUBAHAN KODE --- */}
+
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                     Bansos Yang Diterima
@@ -292,4 +347,4 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
             </div>
         </form>
     );
-}
+}   

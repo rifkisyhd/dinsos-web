@@ -3,7 +3,7 @@
 "use client";
 
 import { useState } from "react";
-import Button from "../components/Button";
+import Button from "../components/Button"; // Pastikan path ini sesuai dengan struktur proyek Anda
 
 export default function FormCatatan({ setStep, submitAllData }) {
     const [catatan, setCatatan] = useState("");
@@ -51,33 +51,30 @@ export default function FormCatatan({ setStep, submitAllData }) {
                 mendapatkan Program Sekolah Rakyat
             </p>
 
-            <div className="flex justify-between mt-6">
-                <div className="w-1/3">
-                    <Button
-                        label="Sebelumnya"
-                        variant="secondary"
-                        onClick={() => setStep(8)}
-                        disabled={isSubmitting}
-                    />
-                </div>
-                <div className="w-1/3">
-                    <Button
-                        label={
-                            isSubmitting ? (
-                                <div className="flex items-center gap-2">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                                    Mengirim...
-                                </div>
-                            ) : (
-                                "Kirim"
-                            )
-                        }
-                        type="submit"
-                        variant="success"
-                        disabled={isSubmitting}
-                    />
-                </div>
+            {/* --- BAGIAN YANG DIPERBARUI --- */}
+            <div className="flex justify-end gap-4 mt-6">
+                <Button
+                    label="Sebelumnya"
+                    variant="secondary"
+                    onClick={() => setStep(8)}
+                    disabled={isSubmitting}
+                />
+                <Button
+                    label={
+                        isSubmitting ? (
+                            <div className="flex items-center gap-2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                                Mengirim...
+                            </div>
+                        ) : (
+                            "Kirim"
+                        )
+                    }
+                    type="submit"
+                    variant="success"
+                    disabled={isSubmitting}
+                />
             </div>
         </form>
     );
-}
+}   
