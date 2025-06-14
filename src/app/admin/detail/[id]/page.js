@@ -1,12 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { getPublicUrl } from "@/lib/getPublicUrl";
 import Image from "next/image";
 
 // import { supabase } from "@/utils/supabase";
 import { supabase } from "@/lib/supabaseClient";
 
-export default function DetailPage({ params }) {
+export default function DetailPage() {
+    const params = useParams();
+    const id = params.id;
     const router = useRouter();
     const [data, setData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -70,6 +73,14 @@ export default function DetailPage({ params }) {
             </div>
         );
     }
+    const FotoSiswa = getPublicUrl(data.foto_siswa);
+    const FotoOrangTua = getPublicUrl(data.foto_orang_tua);
+    const FotoRumahDepan = getPublicUrl(data.foto_rumah_depan);
+    const FotoRumahDalam = getPublicUrl(data.foto_rumah_dalam);
+    const FotoRumahSamping = getPublicUrl(data.foto_rumah_samping);
+    const SuratPernyataan = getPublicUrl(data.surat_pernyataan);
+    const SKTM = getPublicUrl(data.sktm);
+    const FotoProduk = getPublicUrl(data.foto_produk);
 
     return (
         <div className="p-6 max-w-6xl mx-auto">
@@ -187,43 +198,16 @@ export default function DetailPage({ params }) {
                     Dokumen & Foto
                 </h2>
                 <div className="grid grid-cols-3 gap-4">
-                    {data.foto_siswa && (
-                        <ImagePreview
-                            label="Foto Siswa"
-                            src={data.foto_siswa}
-                        />
-                    )}
-                    {data.foto_orang_tua && (
-                        <ImagePreview
-                            label="Foto Orang Tua"
-                            src={data.foto_orang_tua}
-                        />
-                    )}
-                    {data.foto_rumah_depan && (
-                        <ImagePreview
-                            label="Rumah Depan"
-                            src={data.foto_rumah_depan}
-                        />
-                    )}
-                    {data.foto_rumah_dalam && (
-                        <ImagePreview
-                            label="Rumah Dalam"
-                            src={data.foto_rumah_dalam}
-                        />
-                    )}
-                    {data.foto_rumah_samping && (
-                        <ImagePreview
-                            label="Rumah Samping"
-                            src={data.foto_rumah_samping}
-                        />
-                    )}
-                    {data.surat_pernyataan && (
-                        <FileLink
-                            label="Surat Pernyataan"
-                            url={data.surat_pernyataan}
-                        />
-                    )}
-                    {data.sktm && <FileLink label="SKTM" url={data.sktm} />}
+                    <ImagePreview label="Foto Siswa" src={FotoSiswa} />
+                    <ImagePreview label="Foto Orang Tua" src={FotoOrangTua} />
+                    <ImagePreview label="Rumah Depan" src={FotoRumahDepan} />
+                    <ImagePreview label="Rumah Dalam" src={FotoRumahDalam} />
+                    <ImagePreview
+                        label="Rumah Samping"
+                        src={FotoRumahSamping}
+                    />
+                    <FileLink label="Surat Pernyataan" url={SuratPernyataan} />
+                    <FileLink label="SKTM" url={SKTM} />
                 </div>
 
                 <h2 className="text-xl font-semibold border-b pb-2">Petugas</h2>
