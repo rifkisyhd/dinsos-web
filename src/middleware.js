@@ -22,9 +22,14 @@ export async function middleware(req) {
         return NextResponse.redirect(new URL("/admin", req.url));
     }
 
+    // Sudah login, tapi akses / → lempar ke /admin
+    if (req.nextUrl.pathname === "/" && session) {
+        return NextResponse.redirect(new URL("/admin", req.url));
+    }
+
     return res;
 }
 
 export const config = {
-    matcher: ["/admin/:path*", "/login"],
+    matcher: ["/admin/:path*", "/login", "/"],
 };
