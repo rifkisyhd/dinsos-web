@@ -12,9 +12,14 @@ export async function middleware(req) {
 
     console.log("Session dari middleware:", session);
 
-    // Middleware route protect logic
+    // Belum login, tapi akses /admin → lempar ke /login
     if (req.nextUrl.pathname.startsWith("/admin") && !session) {
         return NextResponse.redirect(new URL("/login", req.url));
+    }
+
+    // Sudah login, tapi akses /login → lempar ke /admin
+    if (req.nextUrl.pathname === "/login" && session) {
+        return NextResponse.redirect(new URL("/admin", req.url));
     }
 
     return res;
