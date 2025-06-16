@@ -150,7 +150,7 @@ export default function Page() {
                 produk_usaha: finalData.produkUsaha,
                 foto_produk: await uploadFile(
                     "fotoProduk",
-                    dokumen.fotoProduk,
+                    formUsaha.fotoProduk,
                 ),
 
                 // Path dokumen

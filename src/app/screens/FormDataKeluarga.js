@@ -166,7 +166,7 @@ export default function FormDataKeluarga({ setStep, form, setForm }) {
             <input
                 name="nominalPenghasilan"
                 type="number"
-                value={form.nominalPenghasilan}
+                value={form.nominalPenghasilan || ""}
                 onChange={(e) =>
                     handleChange("nominalPenghasilan", e.target.value)
                 }

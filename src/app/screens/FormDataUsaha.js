@@ -50,7 +50,7 @@ export default function FormDataUsaha({ setStep, form, setForm, allFormData }) {
     const handleRemoveFile = () => {
         setForm((prev) => ({
             ...prev,
-            file: null,
+            fotoProduk: null,
             fileName: "",
             filePreview: null,
         }));
@@ -60,6 +60,10 @@ export default function FormDataUsaha({ setStep, form, setForm, allFormData }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         // Tidak melakukan submit ke database di sini, hanya mencegah reload
+    };
+
+    const handleResetForm = () => {
+        setForm({});
     };
 
     return (
@@ -97,7 +101,15 @@ export default function FormDataUsaha({ setStep, form, setForm, allFormData }) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Foto Produk/Tempat (JPG, PNG)
             </label>
-            {form.file ? (
+
+            {/* Selalu render input-nya tapi hidden */}
+            <input
+                id="fileInput"
+                type="file"
+                className="hidden"
+                onChange={handleFileChange}
+            />
+            {form.fotoProduk ? (
                 <div className="mb-4">
                     <Image
                         src={form.filePreview}
@@ -146,6 +158,7 @@ export default function FormDataUsaha({ setStep, form, setForm, allFormData }) {
                 <Button
                     label="Reset"
                     type="reset"
+                    onClick={handleResetForm}
                     className="bg-yellow-500 text-white px-4 py-2 rounded"
                 />
                 <Button
