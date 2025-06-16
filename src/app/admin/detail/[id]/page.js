@@ -81,7 +81,7 @@ export default function DetailPage() {
     const SuratPernyataan = getPublicUrl(data.surat_pernyataan);
     const SKTM = getPublicUrl(data.sktm);
     const FotoProduk = getPublicUrl(data.foto_produk);
-    const HasilPDF = getPublicUrl(data.hasil_pdf);
+    const HasilPDF = data.hasil_pdf;
 
     return (
         <div className="p-6 max-w-6xl mx-auto">
