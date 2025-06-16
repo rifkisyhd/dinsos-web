@@ -10,6 +10,7 @@ export default function AdminPanel() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState([]);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState("");
     const [availableMonths, setAvailableMonths] = useState([]);
     const [selectedYear, setSelectedYear] = useState("");
@@ -19,29 +20,37 @@ export default function AdminPanel() {
     const [selectedPetugas, setSelectedPetugas] = useState("");
     const [selectedKabupaten, setSelectedKabupaten] = useState("");
     const [kabupatenList, setKabupatenList] = useState([]);
+    const [page, setPage] = useState(1);
+    const perPage = 20;
 
     useEffect(() => {
         const checkAuth = async () => {
-            const { data, error } = await supabase.auth.getSession();
-
-            console.log("Session di /admin:", data.session);
-
+            const { data } = await supabase.auth.getSession();
             if (!data.session) {
                 router.push("/login");
-                return;
+            } else {
+                setIsAuthenticated(true); // tandain kalo udah login
             }
-
-            fetchData();
         };
 
         checkAuth();
     }, []);
 
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchData();
+        }
+    }, [isAuthenticated, page]);
+
     const fetchData = async () => {
         try {
-            const { data, error } = await supabase
+            const from = (page - 1) * perPage;
+            const to = from + perPage - 1;
+
+            const { data, error, count } = await supabase
                 .from("tb_input")
-                .select("*")
+                .select("*", { count: "exact" }) // dapetin total count juga
+                .range(from, to)
                 .order("created_at", { ascending: false });
 
             if (error) throw error;
@@ -362,6 +371,22 @@ export default function AdminPanel() {
                             )}
                         </tbody>
                     </table>
+                    <div className="flex justify-between items-center mt-4">
+                        <button
+                            onClick={() =>
+                                setPage((prev) => Math.max(prev - 1, 1))
+                            }
+                            disabled={page === 1}
+                            className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50">
+                            Prev
+                        </button>
+                        <span>Halaman {page}</span>
+                        <button
+                            onClick={() => setPage((prev) => prev + 1)}
+                            className="px-4 py-2 bg-blue-500 text-white rounded">
+                            Next
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
