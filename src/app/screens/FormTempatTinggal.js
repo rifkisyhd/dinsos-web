@@ -111,7 +111,7 @@ export default function FormTempatTinggal({ setStep, form, setForm }) {
                     (item) => item.value === form.kabupaten,
                 )}
                 onChange={(selectedOption) => {
-                    handleChange("kabupaten", selectedOption.value);
+                    handleChange("kabupaten", selectedOption.label);
                     fetchKecamatan(selectedOption.value);
                 }}
                 isLoading={isLoading.kabupaten}
@@ -130,7 +130,7 @@ export default function FormTempatTinggal({ setStep, form, setForm }) {
                     (item) => item.value === form.kecamatan,
                 )}
                 onChange={(selectedOption) => {
-                    handleChange("kecamatan", selectedOption.value);
+                    handleChange("kecamatan", selectedOption.label);
                     fetchKelurahan(selectedOption.value);
                 }}
                 isLoading={isLoading.kecamatan}
@@ -150,7 +150,7 @@ export default function FormTempatTinggal({ setStep, form, setForm }) {
                     (item) => item.value === form.kelurahan,
                 )}
                 onChange={(selectedOption) =>
-                    handleChange("kelurahan", selectedOption.value)
+                    handleChange("kelurahan", selectedOption.label)
                 }
                 isLoading={isLoading.kelurahan}
                 placeholder={
