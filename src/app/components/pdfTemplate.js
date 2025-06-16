@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 
 /**
  * @param {Object} data - Data hasil input form (snake_case).
+ * @returns {Promise<Blob>} - Promise yang akan resolve dengan PDF sebagai Blob.
  */
 export const generateAssessmentPDF = async (data) => {
   // Log data yang diterima untuk memastikan datanya tidak kosong
@@ -38,6 +39,7 @@ export const generateAssessmentPDF = async (data) => {
     loadImage(storageUrl(data.foto_produk)),
   ]);
 
+  // Menggunakan struktur HTML dari kode Anda, termasuk style pada H2
   const html = `
     <div style="font-family: Arial, sans-serif; font-size: 10px; padding: 15px; max-width: 800px;">
         <h2 style="text-align: center; font-size: 14px; margin: 0 100px 20px 0;">BUKTI PENDAFTARAN PESERTA DIDIK BARU<br/>SEKOLAH RAKYAT</h2>
@@ -168,42 +170,43 @@ export const generateAssessmentPDF = async (data) => {
              </table>
         </div>
     </div>`;
+  
+  // Menggunakan logika fungsional saya untuk menghasilkan Blob
+  return new Promise(async (resolve, reject) => {
+    try {
+      const container = document.createElement("div");
+      container.style.width = "800px";
+      container.innerHTML = html;
+      document.body.appendChild(container);
 
-  const container = document.createElement("div");
-  container.style.width = "800px";
-  container.innerHTML = html;
-  document.body.appendChild(container);
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "px",
+        format: "a4",
+        hotfixes: ["px_scaling"],
+      });
 
-  const pdf = new jsPDF({
-    orientation: "landscape",
-    unit: "px",
-    format: "a4",
-    hotfixes: ["px_scaling"],
+      const contentWidth = 800;
+      const leftMargin = 45; 
+
+      await pdf.html(container, {
+        callback: function (doc) {
+          document.body.removeChild(container);
+          const blob = doc.output('blob');
+          resolve(blob);
+        },
+        x: leftMargin,
+        y: 15,
+        width: contentWidth,
+        windowWidth: contentWidth,
+        html2canvas: {
+          scale: 1.5,
+          useCORS: true,
+          allowTaint: true,
+        },
+      });
+    } catch (error) {
+      reject(error);
+    }
   });
-
-  const contentWidth = 800;
-
-  // --- PENYESUAIAN POSISI ---
-  // Gunakan variabel ini untuk mengatur posisi dari tepi kiri halaman.
-  const leftMargin = 45; // Coba mulai dengan angka ini.
-
-  // Jika hasilnya masih terlalu ke kiri, PERBESAR angkanya (misal: 50, 60).
-  // Jika hasilnya terlalu ke kanan, PERKECIL angkanya (misal: 40, 30).
-
-  await pdf.html(container, {
-    callback: function (doc) {
-      doc.save("pendaftaran-sekolah-rakyat.pdf");
-      document.body.removeChild(container);
-    },
-    // Langsung gunakan nilai margin yang sudah Anda tentukan.
-    x: leftMargin,
-    y: 15,
-    width: contentWidth,
-    windowWidth: contentWidth,
-    html2canvas: {
-      scale: 1.5,
-      useCORS: true,
-      allowTaint: true,
-    },
-  });
-};
+};  

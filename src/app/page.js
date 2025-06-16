@@ -43,25 +43,19 @@ export default function Page() {
         ...formCatatan,
     };
 
-    // Fungsi untuk submit semua data ke Supabase
+    // Fungsi untuk submit semua data ke Supabase (versi yang sudah diperbaiki)
     const submitAllData = async (catatanData) => {
         try {
             // Gabungkan semua data form dengan catatan terakhir
             const finalData = { ...allFormData, ...catatanData };
-            const dokumen = formDokumen; // Gunakan formDokumen, bukan allFormData
+            const dokumen = formDokumen;
 
-            // Upload file satu per satu jika ada
             const uploadFile = async (name, file) => {
                 if (!file) return "";
                 try {
                     const { data, error } = await supabase.storage
-                        .from(
-                            process.env.NEXT_PUBLIC_SUPABASE_BUCKET ||
-                                "uploads",
-                        )
-                        .upload(`${name}/${Date.now()}_${file.name}`, file, {
-                            upsert: true,
-                        });
+                        .from(process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "uploads")
+                        .upload(`${name}/${Date.now()}_${file.name}`, file, { upsert: true });
                     if (error) throw new Error(error.message);
                     return data.path;
                 } catch (error) {
@@ -70,36 +64,17 @@ export default function Page() {
                 }
             };
 
-            // Upload semua file dokumen
-            const fotoSiswaPath = await uploadFile(
-                "fotoSiswa",
-                dokumen.fotoSiswa,
-            );
-            const fotoOrangTuaPath = await uploadFile(
-                "fotoOrangTua",
-                dokumen.fotoOrangTua,
-            );
-            const fotoRumahDepanPath = await uploadFile(
-                "fotoRumahDepan",
-                dokumen.fotoRumahDepan,
-            );
-            const fotoRumahDalamPath = await uploadFile(
-                "fotoRumahDalam",
-                dokumen.fotoRumahDalam,
-            );
-            const fotoRumahSampingPath = await uploadFile(
-                "fotoRumahSamping",
-                dokumen.fotoRumahSamping,
-            );
-            const suratPernyataanPath = await uploadFile(
-                "suratPernyataan",
-                dokumen.suratPernyataan,
-            );
+            // Upload semua file dokumen (logika ini tetap sama)
+            const fotoSiswaPath = await uploadFile("fotoSiswa", dokumen.fotoSiswa);
+            const fotoOrangTuaPath = await uploadFile("fotoOrangTua", dokumen.fotoOrangTua);
+            const fotoRumahDepanPath = await uploadFile("fotoRumahDepan", dokumen.fotoRumahDepan);
+            const fotoRumahDalamPath = await uploadFile("fotoRumahDalam", dokumen.fotoRumahDalam);
+            const fotoRumahSampingPath = await uploadFile("fotoRumahSamping", dokumen.fotoRumahSamping);
+            const suratPernyataanPath = await uploadFile("suratPernyataan", dokumen.suratPernyataan);
             const sktmPath = await uploadFile("sktm", dokumen.sktm);
 
-            // Mapping ke snake_case
+            // Mapping ke snake_case (logika ini tetap sama)
             const mappedData = {
-                // Data siswa & keluarga
                 nama_lengkap: finalData.namaLengkap,
                 nik: finalData.nik,
                 nomor_kk: finalData.nomorKK,
@@ -119,15 +94,10 @@ export default function Page() {
                 ayah: finalData.ayah,
                 ibu: finalData.ibu,
                 wali: finalData.wali,
-
-                // --- PENAMBAHAN MAPPING DATA BARU ---
                 dtsen_desil: finalData.dtsenDesil,
                 sekolah_asal: finalData.sekolahAsal,
                 bersedia_asrama: finalData.bersediaAsrama,
                 sudah_pernyataan: finalData.sudahPernyataan,
-                // --- AKHIR PENAMBAHAN MAPPING ---
-
-                // Data ekonomi
                 penghasilan: finalData.penghasilan,
                 nominal_penghasilan: finalData.nominalPenghasilan,
                 pengeluaran: finalData.pengeluaran,
@@ -136,24 +106,15 @@ export default function Page() {
                 penjelasan_pekerjaan: finalData.penjelasanPekerjaan,
                 pekerjaan_ibu: finalData.pekerjaanIbu,
                 jumlah_tanggungan: finalData.jumlahTanggungan,
-
-                // Data tempat tinggal
                 status_tanah: finalData.statusTanah,
                 status_rumah: finalData.statusRumah,
                 luas_tanah: finalData.luasTanah,
                 luas_rumah: finalData.luasRumah,
                 sumber_penerangan: finalData.sumberPenerangan,
                 id_listrik: finalData.idListrik,
-
-                // Data usaha
                 jenis_usaha: finalData.jenisUsahaId,
                 produk_usaha: finalData.produkUsaha,
-                foto_produk: await uploadFile(
-                    "fotoProduk",
-                    formUsaha.fotoProduk,
-                ),
-
-                // Path dokumen
+                foto_produk: await uploadFile("fotoProduk", formUsaha.fotoProduk),
                 foto_siswa: fotoSiswaPath,
                 foto_orang_tua: fotoOrangTuaPath,
                 foto_rumah_depan: fotoRumahDepanPath,
@@ -161,56 +122,54 @@ export default function Page() {
                 foto_rumah_samping: fotoRumahSampingPath,
                 surat_pernyataan: suratPernyataanPath,
                 sktm: sktmPath,
-
-                // Data petugas
                 petugas: finalData.petugas,
                 nama_petugas: finalData.namaPetugas,
                 nomor_hp_petugas: finalData.nomorHpPetugas,
                 lokasi: finalData.lokasi,
                 catatan: finalData.catatan,
-
-                // Transform bansos from object to string
                 bansos: Object.entries(finalData.bansos || {})
-                    .filter(([_, value]) => value) // only get selected bansos
-                    .map(([key]) => key.split("_").join(" ")) // convert key back to readable text
-                    .join(", "), // join with comma
+                    .filter(([_, value]) => value)
+                    .map(([key]) => key.split("_").join(" "))
+                    .join(", "),
             };
 
-            // 1. Generate PDF
+            // PERUBAHAN UTAMA DIMULAI DI SINI
+            
+            // 1. Generate PDF dan dapatkan datanya sebagai Blob
             const pdfBlob = await generateAssessmentPDF(mappedData);
+            if (!pdfBlob) {
+                throw new Error("Gagal membuat file PDF.");
+            }
 
             // 2. Buat nama file unik
             const pdfFileName = `pdf/${Date.now()}_${mappedData.nik}.pdf`;
-
             console.log("PDF siap upload:", pdfFileName);
 
-            // 3. Upload ke Supabase Storage
-            const { data: uploadData, error: uploadError } =
-                await supabase.storage
-                    .from("uploads")
-                    .upload(pdfFileName, pdfBlob, {
-                        contentType: "application/pdf",
-                        upsert: true, // biar gak error kalau file dengan nama sama udah ada
-                    });
+            // 3. Upload Blob PDF ke Supabase Storage
+            const { error: uploadError } = await supabase.storage
+                .from("uploads")
+                .upload(pdfFileName, pdfBlob, {
+                    contentType: "application/pdf",
+                    upsert: true,
+                });
 
             if (uploadError) {
                 console.error("Gagal upload PDF:", uploadError);
                 throw new Error("Gagal upload PDF: " + uploadError.message);
             }
 
-            // 4. Ambil public URL buat disimpan ke database
+            // 4. Ambil public URL untuk disimpan ke database
             const { data: publicUrlData } = supabase.storage
                 .from("uploads")
                 .getPublicUrl(pdfFileName);
 
             const publicUrl = publicUrlData.publicUrl;
-
             console.log("Public URL PDF:", publicUrl);
 
-            // 5. Insert ke database
+            // 5. Insert semua data (termasuk URL PDF) ke tabel
             const { error: dbError } = await supabase.from("tb_input").insert({
                 ...mappedData,
-                hasil_pdf: publicUrl, // langsung simpan public URL-nya
+                hasil_pdf: publicUrl,
             });
 
             if (dbError) {
@@ -218,17 +177,23 @@ export default function Page() {
                 throw new Error("Gagal insert DB: " + dbError.message);
             }
 
-            // Tampilkan alert sukses dengan opsi export PDF
+            // 6. Tampilkan alert sukses dengan opsi download dari Blob yang sama
             await Swal.fire({
                 icon: "success",
                 title: "Berhasil",
-                text: "Data berhasil disimpan ke database!",
+                text: "Data berhasil disimpan dan PDF telah di-upload!",
                 showCancelButton: true,
-                confirmButtonText: "Lihat Bukti",
+                confirmButtonText: "Download Bukti",
                 cancelButtonText: "Tutup",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    generateAssessmentPDF(mappedData);
+                    // Buat link download dari Blob yang sudah ada di memori
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(pdfBlob);
+                    link.download = `pendaftaran_${mappedData.nik}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                 }
             });
 
@@ -306,4 +271,4 @@ export default function Page() {
             )}
         </>
     );
-}
+}   
