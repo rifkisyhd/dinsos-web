@@ -81,6 +81,7 @@ export default function DetailPage() {
     const SuratPernyataan = getPublicUrl(data.surat_pernyataan);
     const SKTM = getPublicUrl(data.sktm);
     const FotoProduk = getPublicUrl(data.foto_produk);
+    const HasilPDF = getPublicUrl(data.hasil_pdf);
 
     return (
         <div className="p-6 max-w-6xl mx-auto">
@@ -208,6 +209,8 @@ export default function DetailPage() {
                     />
                     <FileLink label="Surat Pernyataan" url={SuratPernyataan} />
                     <FileLink label="SKTM" url={SKTM} />
+                    <FileLink label="Hasil PDF" url={HasilPDF} />
+
                 </div>
 
                 <h2 className="text-xl font-semibold border-b pb-2">Petugas</h2>

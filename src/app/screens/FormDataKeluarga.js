@@ -209,7 +209,7 @@ export default function FormDataKeluarga({ setStep, form, setForm }) {
             <input
                 name="jumlahTanggungan"
                 type="number"
-                value={form.jumlahTanggungan}
+                value={form.jumlahTanggungan || ""}
                 onChange={(e) =>
                     handleChange("jumlahTanggungan", e.target.value)
                 }

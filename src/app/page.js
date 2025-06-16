@@ -176,13 +176,46 @@ export default function Page() {
                     .join(", "), // join with comma
             };
 
-            // Insert ke database
-            const { error } = await supabase
-                .from("tb_input")
-                .insert(mappedData);
+            // 1. Generate PDF
+            const pdfBlob = await generateAssessmentPDF(mappedData);
 
-            if (error) {
-                throw new Error(error.message);
+            // 2. Buat nama file unik
+            const pdfFileName = `pdf/${Date.now()}_${mappedData.nik}.pdf`;
+
+            console.log("PDF siap upload:", pdfFileName);
+
+            // 3. Upload ke Supabase Storage
+            const { data: uploadData, error: uploadError } =
+                await supabase.storage
+                    .from("uploads")
+                    .upload(pdfFileName, pdfBlob, {
+                        contentType: "application/pdf",
+                        upsert: true, // biar gak error kalau file dengan nama sama udah ada
+                    });
+
+            if (uploadError) {
+                console.error("Gagal upload PDF:", uploadError);
+                throw new Error("Gagal upload PDF: " + uploadError.message);
+            }
+
+            // 4. Ambil public URL buat disimpan ke database
+            const { data: publicUrlData } = supabase.storage
+                .from("uploads")
+                .getPublicUrl(pdfFileName);
+
+            const publicUrl = publicUrlData.publicUrl;
+
+            console.log("Public URL PDF:", publicUrl);
+
+            // 5. Insert ke database
+            const { error: dbError } = await supabase.from("tb_input").insert({
+                ...mappedData,
+                hasil_pdf: publicUrl, // langsung simpan public URL-nya
+            });
+
+            if (dbError) {
+                console.error("Gagal insert ke DB:", dbError);
+                throw new Error("Gagal insert DB: " + dbError.message);
             }
 
             // Tampilkan alert sukses dengan opsi export PDF
@@ -273,4 +306,4 @@ export default function Page() {
             )}
         </>
     );
-}   
+}
