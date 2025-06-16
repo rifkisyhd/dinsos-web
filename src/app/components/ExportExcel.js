@@ -1,13 +1,29 @@
 "use client";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import Swal from "sweetalert2";
 
 export default function ExportExcel({
     data = [],
     fileName = "data.xlsx",
     filterMonth = "",
 }) {
-    const handleExport = () => {
+    const handleExport = async () => {
+        const { value: customName } = await Swal.fire({
+            title: "Masukkan nama file",
+            input: "text",
+            inputLabel: "Nama file (tanpa .xlsx)",
+            inputValue: "data_export",
+            showCancelButton: true,
+            confirmButtonText: "Download",
+            cancelButtonText: "Batal",
+            inputValidator: (value) => {
+                if (!value) return "Nama file tidak boleh kosong!";
+            },
+        });
+
+        if (!customName) return;
+
         const filteredData = data.filter((item) => {
             if (!filterMonth) return true;
             const itemMonth = new Date(item.created_at)
@@ -78,7 +94,17 @@ export default function ExportExcel({
         const blob = new Blob([excelBuffer], {
             type: "application/octet-stream",
         });
-        saveAs(blob, fileName);
+
+        saveAs(blob, `${customName}.xlsx`);
+
+        // Tambahin notifikasi berhasil
+        Swal.fire({
+            icon: "success",
+            title: "Berhasil",
+            text: "File berhasil didownload!",
+            timer: 1500,
+            showConfirmButton: false,
+        });
     };
 
     return (
