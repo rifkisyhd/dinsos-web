@@ -2,13 +2,23 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+
 import ExportExcel from "../components/ExportExcel";
+import Swal from "sweetalert2";
 
 export default function AdminPanel() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState([]);
     const [selectedMonth, setSelectedMonth] = useState("");
+    const [availableMonths, setAvailableMonths] = useState([]);
+    const [selectedYear, setSelectedYear] = useState("");
+    const [availableYears, setAvailableYears] = useState([]);
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [petugasList, setPetugasList] = useState([]);
+    const [selectedPetugas, setSelectedPetugas] = useState("");
+    const [selectedKabupaten, setSelectedKabupaten] = useState("");
+    const [kabupatenList, setKabupatenList] = useState([]);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -21,7 +31,7 @@ export default function AdminPanel() {
                 return;
             }
 
-            fetchData(); // kalau session OK
+            fetchData();
         };
 
         checkAuth();
@@ -36,6 +46,37 @@ export default function AdminPanel() {
 
             if (error) throw error;
             setData(data);
+
+            // Ambil tahun
+            const years = [
+                ...new Set(
+                    data.map((item) => new Date(item.created_at).getFullYear()),
+                ),
+            ];
+            setAvailableYears(years.sort((a, b) => b - a));
+
+            // Ambil bulan
+            const months = [
+                ...new Set(
+                    data.map((item) => {
+                        const date = new Date(item.created_at);
+                        return date.toISOString().slice(5, 7); // "01", "02", ...
+                    }),
+                ),
+            ];
+            setAvailableMonths(months.sort()); // urut dari Jan ke Des
+
+            // Ambil nama petugas unik
+            const uniquePetugas = [
+                ...new Set(data.map((item) => item.petugas)),
+            ];
+            setPetugasList(uniquePetugas);
+
+            // Ambil nama kabupaten unik
+            const uniqueKabupaten = [
+                ...new Set(data.map((item) => item.kabupaten)),
+            ];
+            setKabupatenList(uniqueKabupaten);
         } catch (error) {
             console.error("Gagal ambil data:", error.message);
         } finally {
@@ -49,8 +90,23 @@ export default function AdminPanel() {
     };
 
     const handleDelete = async (id) => {
-        await supabase.from("tb_input").delete().eq("id", id);
-        fetchData(); // refresh
+        const result = await Swal.fire({
+            title: "Yakin mau hapus?",
+            text: "Data yang dihapus tidak bisa dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal",
+        });
+
+        if (result.isConfirmed) {
+            await supabase.from("tb_input").delete().eq("id", id);
+            await fetchData(); // Refresh data
+
+            Swal.fire("Terhapus!", "Data berhasil dihapus.", "success");
+        }
     };
 
     if (isLoading) {
@@ -80,10 +136,22 @@ export default function AdminPanel() {
                     </div>
                 </div>
 
+                {/* Search */}
+                <div className="mb-4">
+                    <label className="mr-2 font-semibold">Cari:</label>
+                    <input
+                        type="text"
+                        placeholder="Cari nama atau NIK..."
+                        value={searchKeyword}
+                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        className="border px-3 py-1 rounded w-64"
+                    />
+                </div>
+
                 {/* Filter Bulan */}
                 <div className="mb-4">
                     <label className="mr-2 font-semibold">Filter Bulan:</label>
-                    <select
+                    {/* <select
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(e.target.value)}
                         className="border px-3 py-1 rounded">
@@ -100,6 +168,71 @@ export default function AdminPanel() {
                         <option value="10">Oktober</option>
                         <option value="11">November</option>
                         <option value="12">Desember</option>
+                    </select> */}
+                    <select
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(e.target.value)}
+                        className="border px-3 py-1 rounded">
+                        <option value="">Semua</option>
+                        {availableMonths.map((month) => (
+                            <option key={month} value={month}>
+                                {new Date(
+                                    `2023-${month}-01`,
+                                ).toLocaleDateString("id-ID", {
+                                    month: "long",
+                                })}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                {/* Filter Tahun */}
+                <div className="mb-4">
+                    <label className="mr-2 font-semibold">Filter Tahun:</label>
+                    <select
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(e.target.value)}
+                        className="border px-3 py-1 rounded">
+                        <option value="">Semua</option>
+                        {availableYears.map((year) => (
+                            <option key={year} value={year}>
+                                {year}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                {/* Filter Kabupaten */}
+                <div className="mb-4">
+                    <label className="mr-2 font-semibold">
+                        Filter Kabupaten:
+                    </label>
+                    <select
+                        value={selectedKabupaten}
+                        onChange={(e) => setSelectedKabupaten(e.target.value)}
+                        className="border px-3 py-1 rounded">
+                        <option value="">Semua</option>
+                        {kabupatenList.map((nama, idx) => (
+                            <option key={idx} value={nama}>
+                                {nama}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Filter Petugas */}
+                <div className="mb-4">
+                    <label className="mr-2 font-semibold">
+                        Filter Petugas:
+                    </label>
+                    <select
+                        value={selectedPetugas}
+                        onChange={(e) => setSelectedPetugas(e.target.value)}
+                        className="border px-3 py-1 rounded">
+                        <option value="">Semua</option>
+                        {petugasList.map((nama, idx) => (
+                            <option key={idx} value={nama}>
+                                {nama}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
@@ -112,6 +245,7 @@ export default function AdminPanel() {
                                 <th className="px-4 py-2 border">NIK</th>
                                 <th className="px-4 py-2 border">No. KK</th>
                                 <th className="px-4 py-2 border">Alamat</th>
+                                <th className="px-4 py-2 border">Kabupaten</th>
                                 <th className="px-4 py-2 border">Petugas</th>
                                 <th className="px-4 py-2 border">Aksi</th>
                             </tr>
@@ -128,14 +262,51 @@ export default function AdminPanel() {
                             ) : (
                                 data
                                     .filter((item) => {
-                                        if (!selectedMonth) return true;
-                                        const itemMonth = new Date(
-                                            item.created_at,
-                                        )
+                                        const date = new Date(item.created_at);
+                                        const itemMonth = date
                                             .toISOString()
                                             .slice(5, 7);
-                                        return itemMonth === selectedMonth;
+                                        const itemYear = date
+                                            .getFullYear()
+                                            .toString();
+
+                                        const matchMonth = selectedMonth
+                                            ? itemMonth === selectedMonth
+                                            : true;
+                                        const matchYear = selectedYear
+                                            ? itemYear === selectedYear
+                                            : true;
+
+                                        const keyword =
+                                            searchKeyword.toLowerCase();
+                                        const matchKeyword =
+                                            item.nama_lengkap
+                                                ?.toLowerCase()
+                                                .includes(keyword) ||
+                                            item.nik
+                                                ?.toLowerCase()
+                                                .includes(keyword);
+
+                                        const petugasMatch = selectedPetugas
+                                            ? item.petugas === selectedPetugas
+                                            : true;
+
+                                        const kabupatenMatch = selectedKabupaten
+                                            ? item.kabupaten ===
+                                              selectedKabupaten
+                                            : true;
+
+                                        return (
+                                            matchMonth &&
+                                            matchYear &&
+                                            (searchKeyword
+                                                ? matchKeyword
+                                                : true) &&
+                                            petugasMatch &&
+                                            kabupatenMatch
+                                        );
                                     })
+
                                     .map((item) => (
                                         <tr
                                             key={item.id}
@@ -160,6 +331,9 @@ export default function AdminPanel() {
                                             </td>
                                             <td className="px-4 py-2 border">
                                                 {item.alamat}
+                                            </td>
+                                            <td className="px-4 py-2 border">
+                                                {item.kabupaten}
                                             </td>
                                             <td className="px-4 py-2 border">
                                                 {item.petugas}
