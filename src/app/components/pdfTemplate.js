@@ -209,4 +209,4 @@ export const generateAssessmentPDF = async (data) => {
       reject(error);
     }
   });
-};  
+};

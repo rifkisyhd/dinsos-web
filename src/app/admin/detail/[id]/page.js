@@ -182,17 +182,7 @@ export default function DetailPage() {
                 <h2 className="text-xl font-semibold border-b pb-2">Usaha</h2>
                 <div className="grid grid-cols-2 gap-4">
                     <Detail label="Jenis Usaha" value={data.jenis_usaha} />
-                    <Detail label="Produk Usaha" value={data.produk_usaha} />
-                    {data.foto_produk && (
-                        <div>
-                            <p className="text-gray-600">Foto Produk</p>
-                            <img
-                                src={data.foto_produk}
-                                alt="Foto Produk"
-                                className="w-32 h-32 object-cover border"
-                            />
-                        </div>
-                    )}
+                        <Detail label="Produk Usaha" value={data.produk_usaha} />
                 </div>
 
                 <h2 className="text-xl font-semibold border-b pb-2">
@@ -207,6 +197,7 @@ export default function DetailPage() {
                         label="Rumah Samping"
                         src={FotoRumahSamping}
                     />
+                    <ImagePreview label="Foto Produk" src={FotoProduk} />
                     <FileLink label="Surat Pernyataan" url={SuratPernyataan} />
                     <FileLink label="SKTM" url={SKTM} />
                     <FileLink label="Hasil PDF" url={HasilPDF} />
