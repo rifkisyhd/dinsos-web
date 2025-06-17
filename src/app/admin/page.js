@@ -22,6 +22,7 @@ export default function AdminPanel() {
     const [kabupatenList, setKabupatenList] = useState([]);
     const [page, setPage] = useState(1);
     const perPage = 20;
+    const [totalCount, setTotalCount] = useState(0);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -45,47 +46,60 @@ export default function AdminPanel() {
     const fetchData = async () => {
         try {
             const from = (page - 1) * perPage;
-            const to = from + perPage - 1;
 
-            const { data, error, count } = await supabase
+            // Ambil semua data (buat filter & export)
+            const { data: allData, error: allDataError } = await supabase
                 .from("tb_input")
-                .select("*", { count: "exact" }) // dapetin total count juga
-                .range(from, to)
-                .order("created_at", { ascending: false });
+                .select("*");
 
-            if (error) throw error;
-            setData(data);
+            if (allDataError) throw allDataError;
 
-            // Ambil tahun
+            // Hitung total row
+            setTotalCount(allData.length); // Simpan total ke state
+
+            // Data paginasi
+            const { data: paginatedData, error: rangeError } = await supabase
+                .from("tb_input")
+                .select("*")
+                .order("created_at", { ascending: false })
+                .range(from, from + perPage - 1);
+
+            if (rangeError) throw rangeError;
+
+            // Tahun
             const years = [
                 ...new Set(
-                    data.map((item) => new Date(item.created_at).getFullYear()),
+                    allData.map((item) =>
+                        new Date(item.created_at).getFullYear(),
+                    ),
                 ),
             ];
             setAvailableYears(years.sort((a, b) => b - a));
 
-            // Ambil bulan
+            // Bulan
             const months = [
                 ...new Set(
-                    data.map((item) => {
-                        const date = new Date(item.created_at);
-                        return date.toISOString().slice(5, 7); // "01", "02", ...
-                    }),
+                    allData.map((item) =>
+                        new Date(item.created_at).toISOString().slice(5, 7),
+                    ),
                 ),
             ];
-            setAvailableMonths(months.sort()); // urut dari Jan ke Des
+            setAvailableMonths(months.sort());
 
-            // Ambil nama petugas unik
+            // Petugas
             const uniquePetugas = [
-                ...new Set(data.map((item) => item.petugas)),
+                ...new Set(allData.map((item) => item.petugas)),
             ];
             setPetugasList(uniquePetugas);
 
-            // Ambil nama kabupaten unik
+            // Kabupaten
             const uniqueKabupaten = [
-                ...new Set(data.map((item) => item.kabupaten)),
+                ...new Set(allData.map((item) => item.kabupaten)),
             ];
             setKabupatenList(uniqueKabupaten);
+
+            // Set data yang dipake untuk tampilan
+            setData(paginatedData);
         } catch (error) {
             console.error("Gagal ambil data:", error.message);
         } finally {
@@ -132,7 +146,9 @@ export default function AdminPanel() {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800">Panel Admin</h1>
+                    <h1 className="text-3xl font-bold text-gray-800">
+                        Panel Admin
+                    </h1>
                     <div className="flex space-x-4">
                         <button
                             onClick={handleLogout}
@@ -152,24 +168,36 @@ export default function AdminPanel() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                         {/* Search (dibuat lebih panjang) */}
                         <div className="lg:col-span-2">
-                            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">Cari Nama atau NIK</label>
+                            <label
+                                htmlFor="search"
+                                className="block text-sm font-medium text-gray-700 mb-1">
+                                Cari Nama atau NIK
+                            </label>
                             <input
                                 id="search"
                                 type="text"
                                 placeholder="Ketik di sini..."
                                 value={searchKeyword}
-                                onChange={(e) => setSearchKeyword(e.target.value)}
+                                onChange={(e) =>
+                                    setSearchKeyword(e.target.value)
+                                }
                                 className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                             />
                         </div>
 
                         {/* Filter Tahun */}
                         <div>
-                            <label htmlFor="filter-tahun" className="block text-sm font-medium text-gray-700 mb-1">Tahun</label>
+                            <label
+                                htmlFor="filter-tahun"
+                                className="block text-sm font-medium text-gray-700 mb-1">
+                                Tahun
+                            </label>
                             <select
                                 id="filter-tahun"
                                 value={selectedYear}
-                                onChange={(e) => setSelectedYear(e.target.value)}
+                                onChange={(e) =>
+                                    setSelectedYear(e.target.value)
+                                }
                                 className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                                 <option value="">Semua</option>
                                 {availableYears.map((year) => (
@@ -182,11 +210,17 @@ export default function AdminPanel() {
 
                         {/* Filter Bulan */}
                         <div>
-                            <label htmlFor="filter-bulan" className="block text-sm font-medium text-gray-700 mb-1">Bulan</label>
+                            <label
+                                htmlFor="filter-bulan"
+                                className="block text-sm font-medium text-gray-700 mb-1">
+                                Bulan
+                            </label>
                             <select
                                 id="filter-bulan"
                                 value={selectedMonth}
-                                onChange={(e) => setSelectedMonth(e.target.value)}
+                                onChange={(e) =>
+                                    setSelectedMonth(e.target.value)
+                                }
                                 className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                                 <option value="">Semua</option>
                                 {availableMonths.map((month) => (
@@ -200,14 +234,20 @@ export default function AdminPanel() {
                                 ))}
                             </select>
                         </div>
-                        
+
                         {/* Filter Kabupaten */}
                         <div>
-                            <label htmlFor="filter-kabupaten" className="block text-sm font-medium text-gray-700 mb-1">Kabupaten</label>
+                            <label
+                                htmlFor="filter-kabupaten"
+                                className="block text-sm font-medium text-gray-700 mb-1">
+                                Kabupaten
+                            </label>
                             <select
                                 id="filter-kabupaten"
                                 value={selectedKabupaten}
-                                onChange={(e) => setSelectedKabupaten(e.target.value)}
+                                onChange={(e) =>
+                                    setSelectedKabupaten(e.target.value)
+                                }
                                 className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                                 <option value="">Semua</option>
                                 {kabupatenList.map((nama, idx) => (
@@ -217,24 +257,29 @@ export default function AdminPanel() {
                                 ))}
                             </select>
                         </div>
-                        
+
                         {/* Filter Petugas */}
                         <div className="lg:col-span-2">
-                             <label htmlFor="filter-petugas" className="block text-sm font-medium text-gray-700 mb-1">Petugas</label>
-                             <select
-                                 id="filter-petugas"
-                                 value={selectedPetugas}
-                                 onChange={(e) => setSelectedPetugas(e.target.value)}
-                                 className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                                 <option value="">Semua</option>
-                                 {petugasList.map((nama, idx) => (
-                                     <option key={idx} value={nama}>
-                                         {nama}
-                                     </option>
-                                 ))}
-                             </select>
+                            <label
+                                htmlFor="filter-petugas"
+                                className="block text-sm font-medium text-gray-700 mb-1">
+                                Petugas
+                            </label>
+                            <select
+                                id="filter-petugas"
+                                value={selectedPetugas}
+                                onChange={(e) =>
+                                    setSelectedPetugas(e.target.value)
+                                }
+                                className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <option value="">Semua</option>
+                                {petugasList.map((nama, idx) => (
+                                    <option key={idx} value={nama}>
+                                        {nama}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
-
                     </div>
                 </div>
 
@@ -243,6 +288,7 @@ export default function AdminPanel() {
                     <table className="w-full text-sm text-left text-gray-600">
                         <thead className="bg-gray-100 text-gray-700 uppercase">
                             <tr>
+                                <th className="px-6 py-3">No</th>
                                 <th className="px-6 py-3">Tanggal</th>
                                 <th className="px-6 py-3">Nama</th>
                                 <th className="px-6 py-3">NIK</th>
@@ -265,47 +311,102 @@ export default function AdminPanel() {
                             ) : (
                                 data
                                     .filter((item) => {
-                                      // Logika filter tidak diubah
+                                        // Logika filter tidak diubah
                                         const date = new Date(item.created_at);
-                                        const itemMonth = date.toISOString().slice(5, 7);
-                                        const itemYear = date.getFullYear().toString();
-                                        const matchMonth = selectedMonth ? itemMonth === selectedMonth : true;
-                                        const matchYear = selectedYear ? itemYear === selectedYear : true;
-                                        const keyword = searchKeyword.toLowerCase();
-                                        const matchKeyword = item.nama_lengkap?.toLowerCase().includes(keyword) || item.nik?.toLowerCase().includes(keyword);
-                                        const petugasMatch = selectedPetugas ? item.petugas === selectedPetugas : true;
-                                        const kabupatenMatch = selectedKabupaten ? item.kabupaten === selectedKabupaten : true;
-                                        return matchMonth && matchYear && (searchKeyword ? matchKeyword : true) && petugasMatch && kabupatenMatch;
+                                        const itemMonth = date
+                                            .toISOString()
+                                            .slice(5, 7);
+                                        const itemYear = date
+                                            .getFullYear()
+                                            .toString();
+                                        const matchMonth = selectedMonth
+                                            ? itemMonth === selectedMonth
+                                            : true;
+                                        const matchYear = selectedYear
+                                            ? itemYear === selectedYear
+                                            : true;
+                                        const keyword =
+                                            searchKeyword.toLowerCase();
+                                        const matchKeyword =
+                                            item.nama_lengkap
+                                                ?.toLowerCase()
+                                                .includes(keyword) ||
+                                            item.nik
+                                                ?.toLowerCase()
+                                                .includes(keyword);
+                                        const petugasMatch = selectedPetugas
+                                            ? item.petugas === selectedPetugas
+                                            : true;
+                                        const kabupatenMatch = selectedKabupaten
+                                            ? item.kabupaten ===
+                                              selectedKabupaten
+                                            : true;
+                                        return (
+                                            matchMonth &&
+                                            matchYear &&
+                                            (searchKeyword
+                                                ? matchKeyword
+                                                : true) &&
+                                            petugasMatch &&
+                                            kabupatenMatch
+                                        );
                                     })
-                                    .map((item) => (
+                                    .map((item, index) => (
                                         <tr
                                             key={item.id}
                                             className="hover:bg-gray-50 border-b border-gray-200">
                                             <td className="px-6 py-4">
-                                                {new Date(item.created_at).toLocaleDateString("id-ID", {
+                                                {(page - 1) * perPage +
+                                                    index +
+                                                    1}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {new Date(
+                                                    item.created_at,
+                                                ).toLocaleDateString("id-ID", {
                                                     year: "numeric",
                                                     month: "long",
                                                     day: "numeric",
                                                 })}
                                             </td>
-                                            <td className="px-6 py-4 font-medium text-gray-900">{item.nama_lengkap}</td>
-                                            <td className="px-6 py-4">{item.nik}</td>
-                                            <td className="px-6 py-4">{item.nomor_kk}</td>
-                                            <td className="px-6 py-4">{item.alamat}</td>
-                                            <td className="px-6 py-4">{item.kabupaten}</td>
-                                            <td className="px-6 py-4">{item.petugas}</td>
+                                            <td className="px-6 py-4 font-medium text-gray-900">
+                                                {item.nama_lengkap}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {item.nik}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {item.nomor_kk}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {item.alamat}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {item.kabupaten}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {item.petugas}
+                                            </td>
                                             <td className="px-6 py-4 text-center">
                                                 <div className="flex items-center justify-center space-x-2">
-                                                     <button
-                                                         onClick={() => router.push(`/admin/detail/${item.id}`)}
-                                                         className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors">
-                                                         Detail
-                                                     </button>
-                                                     <button
-                                                         onClick={() => handleDelete(item.id)}
-                                                         className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors">
-                                                         Hapus
-                                                     </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            router.push(
+                                                                `/admin/detail/${item.id}`,
+                                                            )
+                                                        }
+                                                        className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors">
+                                                        Detail
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                item.id,
+                                                            )
+                                                        }
+                                                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors">
+                                                        Hapus
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -323,15 +424,17 @@ export default function AdminPanel() {
                         className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
                         Sebelumnya
                     </button>
-                    <span className="text-sm font-medium text-gray-700">Halaman {page}</span>
+                    <span className="text-sm font-medium text-gray-700">
+                        Halaman {page}
+                    </span>
                     <button
                         onClick={() => setPage((prev) => prev + 1)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        disabled={page * perPage >= totalCount}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                         Berikutnya
                     </button>
                 </div>
-
             </div>
         </div>
     );
-}   
+}
