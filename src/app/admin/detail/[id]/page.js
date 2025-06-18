@@ -101,11 +101,18 @@ export default function DetailPage() {
         <div className="p-6 max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Detail Pendaftaran</h1>
-                <button
-                    onClick={() => router.back()}
-                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                    Kembali
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => router.back()}
+                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                        Kembali
+                    </button>
+                    <button
+                        onClick={() => router.push(`/admin/edit/${data.id}`)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800">
+                        Edit Data
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white shadow-md rounded p-6 space-y-6">
