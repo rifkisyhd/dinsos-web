@@ -1,5 +1,3 @@
-// src/components/FileInput.js
-
 "use client";
 
 import { useRef } from "react";

@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
+import LoadingScreen from "../components/LoadingScreen";
 import Pagination from "../components/Pagination";
 import DataTable from "../components/DataTable";
 import FilterBar from "../components/FilterBar";
 import ExportExcel from "../components/ExportExcel";
-import Swal from "sweetalert2";
 
 export default function AdminPanel() {
     const router = useRouter();
@@ -27,6 +27,8 @@ export default function AdminPanel() {
     const perPage = 20;
     const [totalCount, setTotalCount] = useState(0);
     const totalPages = Math.ceil(totalCount / perPage);
+    const [searchInput, setSearchInput] = useState("");
+
     const handlePageChange = (newPage) => {
         setPage(newPage);
     };
@@ -50,30 +52,92 @@ export default function AdminPanel() {
         }
     }, [isAuthenticated, page]);
 
+    useEffect(() => {
+        if (searchInput === "") {
+            setSearchKeyword("");
+            setPage(1); // reset ke halaman 1 juga biar aman
+        }
+    }, [searchInput]);
+
     const fetchData = async () => {
         try {
+            setIsLoading(true);
+
+            // Hitung offset
             const from = (page - 1) * perPage;
+            const to = from + perPage - 1;
 
-            // Ambil semua data (buat filter & export)
-            const { data: allData, error: allDataError } = await supabase
+            // ==== 1. Ambil total count & data paginasi (dengan filter) ====
+            let query = supabase
                 .from("tb_input")
-                .select("*");
+                .select("*", { count: "exact" }) // penting: buat total count
+                .order("created_at", { ascending: false });
 
-            if (allDataError) throw allDataError;
+            // === APPLY FILTER ===
+            if (searchKeyword) {
+                query = query.or(
+                    `nama_lengkap.ilike.%${searchKeyword}%,nik.ilike.%${searchKeyword}%`,
+                );
+            }
 
-            // Hitung total row
-            setTotalCount(allData.length); // Simpan total ke state
+            if (selectedYear) {
+                query = query.filter(
+                    "extract(year from created_at)",
+                    "eq",
+                    selectedYear,
+                );
+            }
 
-            // Data paginasi
-            const { data: paginatedData, error: rangeError } = await supabase
+            if (selectedMonth) {
+                const formattedMonth = selectedMonth
+                    .toString()
+                    .padStart(2, "0");
+                query = query.filter(
+                    "to_char(created_at, 'MM')",
+                    "eq",
+                    formattedMonth,
+                );
+            }
+
+            if (selectedPetugas) {
+                query = query.eq("petugas", selectedPetugas);
+            }
+
+            if (selectedKabupaten) {
+                query = query.eq("kabupaten", selectedKabupaten);
+            }
+
+            // Hitung total count dulu
+            const countResult = await query;
+            if (countResult.error) throw countResult.error;
+
+            const count = countResult.count || 0;
+            setTotalCount(count);
+
+            // Cek batas halaman
+            const maxPage = Math.max(1, Math.ceil(count / perPage));
+            if (page > maxPage) {
+                setPage(1);
+                return; // biar fetch ulang pakai page=1
+            }
+
+            // Ambil data paginasi
+            const { data: filteredData, error: dataError } = await query.range(
+                from,
+                to,
+            );
+            if (dataError) throw dataError;
+
+            setData(filteredData);
+
+            // ==== 2. Ambil data filter (sekali aja, tidak dipengaruhi paginasi) ====
+            const { data: allData, error: allError } = await supabase
                 .from("tb_input")
-                .select("*")
-                .order("created_at", { ascending: false })
-                .range(from, from + perPage - 1);
+                .select("created_at, petugas, kabupaten"); // cukup ambil kolom yang dibutuhin
 
-            if (rangeError) throw rangeError;
+            if (allError) throw allError;
 
-            // Tahun
+            // Ambil tahun
             const years = [
                 ...new Set(
                     allData.map((item) =>
@@ -93,20 +157,11 @@ export default function AdminPanel() {
             ];
             setAvailableMonths(months.sort());
 
-            // Petugas
-            const uniquePetugas = [
-                ...new Set(allData.map((item) => item.petugas)),
-            ];
-            setPetugasList(uniquePetugas);
-
-            // Kabupaten
-            const uniqueKabupaten = [
+            // Petugas & kabupaten
+            setPetugasList([...new Set(allData.map((item) => item.petugas))]);
+            setKabupatenList([
                 ...new Set(allData.map((item) => item.kabupaten)),
-            ];
-            setKabupatenList(uniqueKabupaten);
-
-            // Set data yang dipake untuk tampilan
-            setData(paginatedData);
+            ]);
         } catch (error) {
             console.error("Gagal ambil data:", error.message);
         } finally {
@@ -120,11 +175,7 @@ export default function AdminPanel() {
     };
 
     if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        );
+        return <LoadingScreen />;
     }
 
     // --- MULAI PERUBAHAN TATA LETAK DI SINI ---
@@ -152,8 +203,10 @@ export default function AdminPanel() {
 
                 {/* Kotak Filter */}
                 <FilterBar
-                    searchKeyword={searchKeyword}
+                    searchInput={searchInput}
+                    setSearchInput={setSearchInput}
                     setSearchKeyword={setSearchKeyword}
+                    setPage={setPage}
                     selectedYear={selectedYear}
                     setSelectedYear={setSelectedYear}
                     availableYears={availableYears}
@@ -185,7 +238,7 @@ export default function AdminPanel() {
                 {/* Pagination */}
                 <Pagination
                     page={page}
-                    totalPages={totalPages}
+                    totalPages={Math.max(1, Math.ceil(totalCount / perPage))}
                     handlePageChange={handlePageChange}
                 />
             </div>

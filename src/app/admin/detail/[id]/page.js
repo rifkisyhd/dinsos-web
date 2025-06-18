@@ -5,6 +5,7 @@ import { getPublicUrl } from "@/lib/getPublicUrl";
 import Image from "next/image";
 
 // import { supabase } from "@/utils/supabase";
+import LoadingScreen from "../../../components/LoadingScreen";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function DetailPage() {
@@ -67,11 +68,7 @@ export default function DetailPage() {
     );
 
     if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        );
+          return <LoadingScreen />;
     }
     const FotoSiswa = getPublicUrl(data.foto_siswa);
     const FotoOrangTua = getPublicUrl(data.foto_orang_tua);
