@@ -24,15 +24,8 @@ export default function ExportExcel({
 
         if (!customName) return;
 
-        const filteredData = data.filter((item) => {
-            if (!filterMonth) return true;
-            const itemMonth = new Date(item.created_at)
-                .toISOString()
-                .slice(5, 7);
-            return itemMonth === filterMonth;
-        });
-
-        const exportData = filteredData.map((item) => ({
+        // LANGSUNG PAKAI data, TANPA FILTER LAGI
+        const exportData = data.map((item) => ({
             Tanggal: new Date(item.created_at).toLocaleDateString("id-ID", {
                 year: "numeric",
                 month: "long",
@@ -91,13 +84,13 @@ export default function ExportExcel({
             bookType: "xlsx",
             type: "array",
         });
+
         const blob = new Blob([excelBuffer], {
             type: "application/octet-stream",
         });
 
         saveAs(blob, `${customName}.xlsx`);
 
-        // Tambahin notifikasi berhasil
         Swal.fire({
             icon: "success",
             title: "Berhasil",

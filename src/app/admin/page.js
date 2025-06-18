@@ -28,6 +28,7 @@ export default function AdminPanel() {
     const [totalCount, setTotalCount] = useState(0);
     const totalPages = Math.ceil(totalCount / perPage);
     const [searchInput, setSearchInput] = useState("");
+    const [filteredAllData, setFilteredAllData] = useState([]);
 
     const handlePageChange = (newPage) => {
         setPage(newPage);
@@ -50,7 +51,15 @@ export default function AdminPanel() {
         if (isAuthenticated) {
             fetchData();
         }
-    }, [isAuthenticated, page]);
+    }, [
+        isAuthenticated,
+        page,
+        searchKeyword,
+        selectedMonth,
+        selectedYear,
+        selectedPetugas,
+        selectedKabupaten,
+    ]);
 
     useEffect(() => {
         if (searchInput === "") {
@@ -70,7 +79,7 @@ export default function AdminPanel() {
             // ==== 1. Ambil total count & data paginasi (dengan filter) ====
             let query = supabase
                 .from("tb_input")
-                .select("*", { count: "exact" }) // penting: buat total count
+                .select("*", { count: "exact" })
                 .order("created_at", { ascending: false });
 
             // === APPLY FILTER ===
@@ -79,7 +88,6 @@ export default function AdminPanel() {
                     `nama_lengkap.ilike.%${searchKeyword}%,nik.ilike.%${searchKeyword}%`,
                 );
             }
-
             if (selectedYear) {
                 query = query.filter(
                     "extract(year from created_at)",
@@ -87,7 +95,6 @@ export default function AdminPanel() {
                     selectedYear,
                 );
             }
-
             if (selectedMonth) {
                 const formattedMonth = selectedMonth
                     .toString()
@@ -98,11 +105,9 @@ export default function AdminPanel() {
                     formattedMonth,
                 );
             }
-
             if (selectedPetugas) {
                 query = query.eq("petugas", selectedPetugas);
             }
-
             if (selectedKabupaten) {
                 query = query.eq("kabupaten", selectedKabupaten);
             }
@@ -118,7 +123,7 @@ export default function AdminPanel() {
             const maxPage = Math.max(1, Math.ceil(count / perPage));
             if (page > maxPage) {
                 setPage(1);
-                return; // biar fetch ulang pakai page=1
+                return;
             }
 
             // Ambil data paginasi
@@ -127,14 +132,58 @@ export default function AdminPanel() {
                 to,
             );
             if (dataError) throw dataError;
-
             setData(filteredData);
+
+            // Ambil semua data hasil filter (tanpa paginasi)
+            let allFilteredQuery = supabase
+                .from("tb_input")
+                .select("*")
+                .order("created_at", { ascending: false });
+
+            if (searchKeyword) {
+                allFilteredQuery = allFilteredQuery.or(
+                    `nama_lengkap.ilike.%${searchKeyword}%,nik.ilike.%${searchKeyword}%`,
+                );
+            }
+            if (selectedYear) {
+                allFilteredQuery = allFilteredQuery.filter(
+                    "extract(year from created_at)",
+                    "eq",
+                    selectedYear,
+                );
+            }
+            if (selectedMonth) {
+                const formattedMonth = selectedMonth
+                    .toString()
+                    .padStart(2, "0");
+                allFilteredQuery = allFilteredQuery.filter(
+                    "to_char(created_at, 'MM')",
+                    "eq",
+                    formattedMonth,
+                );
+            }
+            if (selectedPetugas) {
+                allFilteredQuery = allFilteredQuery.eq(
+                    "petugas",
+                    selectedPetugas,
+                );
+            }
+            if (selectedKabupaten) {
+                allFilteredQuery = allFilteredQuery.eq(
+                    "kabupaten",
+                    selectedKabupaten,
+                );
+            }
+
+            const { data: allFiltered, error: allFilteredError } =
+                await allFilteredQuery;
+            if (allFilteredError) throw allFilteredError;
+            setFilteredAllData(allFiltered);
 
             // ==== 2. Ambil data filter (sekali aja, tidak dipengaruhi paginasi) ====
             const { data: allData, error: allError } = await supabase
                 .from("tb_input")
-                .select("created_at, petugas, kabupaten"); // cukup ambil kolom yang dibutuhin
-
+                .select("created_at, petugas, kabupaten");
             if (allError) throw allError;
 
             // Ambil tahun
@@ -194,7 +243,7 @@ export default function AdminPanel() {
                             Logout
                         </button>
                         <ExportExcel
-                            data={data}
+                            data={filteredAllData}
                             filterMonth={selectedMonth}
                             fileName="data_admin.xlsx"
                         />
