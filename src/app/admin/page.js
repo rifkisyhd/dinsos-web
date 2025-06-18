@@ -88,23 +88,29 @@ export default function AdminPanel() {
                     `nama_lengkap.ilike.%${searchKeyword}%,nik.ilike.%${searchKeyword}%`,
                 );
             }
-            if (selectedYear) {
-                query = query.filter(
-                    "extract(year from created_at)",
-                    "eq",
+
+            // Filter tahun & bulan pakai range tanggal
+            if (selectedYear && selectedMonth) {
+                const start = `${selectedYear}-${selectedMonth.padStart(
+                    2,
+                    "0",
+                )}-01`;
+                const endDate = new Date(
                     selectedYear,
-                );
+                    Number(selectedMonth),
+                    0,
+                ).getDate();
+                const end = `${selectedYear}-${selectedMonth.padStart(
+                    2,
+                    "0",
+                )}-${endDate}`;
+                query = query.gte("created_at", start).lte("created_at", end);
+            } else if (selectedYear) {
+                const start = `${selectedYear}-01-01`;
+                const end = `${selectedYear}-12-31`;
+                query = query.gte("created_at", start).lte("created_at", end);
             }
-            if (selectedMonth) {
-                const formattedMonth = selectedMonth
-                    .toString()
-                    .padStart(2, "0");
-                query = query.filter(
-                    "to_char(created_at, 'MM')",
-                    "eq",
-                    formattedMonth,
-                );
-            }
+
             if (selectedPetugas) {
                 query = query.eq("petugas", selectedPetugas);
             }
@@ -145,22 +151,29 @@ export default function AdminPanel() {
                     `nama_lengkap.ilike.%${searchKeyword}%,nik.ilike.%${searchKeyword}%`,
                 );
             }
-            if (selectedYear) {
-                allFilteredQuery = allFilteredQuery.filter(
-                    "extract(year from created_at)",
-                    "eq",
+            if (selectedYear && selectedMonth) {
+                const start = `${selectedYear}-${selectedMonth.padStart(
+                    2,
+                    "0",
+                )}-01`;
+                const endDate = new Date(
                     selectedYear,
-                );
-            }
-            if (selectedMonth) {
-                const formattedMonth = selectedMonth
-                    .toString()
-                    .padStart(2, "0");
-                allFilteredQuery = allFilteredQuery.filter(
-                    "to_char(created_at, 'MM')",
-                    "eq",
-                    formattedMonth,
-                );
+                    Number(selectedMonth),
+                    0,
+                ).getDate();
+                const end = `${selectedYear}-${selectedMonth.padStart(
+                    2,
+                    "0",
+                )}-${endDate}`;
+                allFilteredQuery = allFilteredQuery
+                    .gte("created_at", start)
+                    .lte("created_at", end);
+            } else if (selectedYear) {
+                const start = `${selectedYear}-01-01`;
+                const end = `${selectedYear}-12-31`;
+                allFilteredQuery = allFilteredQuery
+                    .gte("created_at", start)
+                    .lte("created_at", end);
             }
             if (selectedPetugas) {
                 allFilteredQuery = allFilteredQuery.eq(

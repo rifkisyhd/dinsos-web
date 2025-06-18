@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getPublicUrl } from "@/lib/getPublicUrl";
 import Image from "next/image";
@@ -43,32 +43,47 @@ export default function DetailPage() {
         </div>
     );
 
-    const ImagePreview = ({ label, src }) => (
-        <div>
-            <p className="text-gray-600">{label}</p>
-            <img
-                src={src}
-                alt={label}
-                className="w-32 h-32 object-cover border rounded"
-            />
-        </div>
-    );
+    const ImagePreview = ({ label, src }) => {
+        const [error, setError] = useState(false);
+
+        return (
+            <div>
+                <p className="text-gray-600">{label}</p>
+                {src && !error ? (
+                    <img
+                        src={src}
+                        alt={label}
+                        className="w-32 h-32 object-cover border rounded"
+                        onError={() => setError(true)}
+                    />
+                ) : (
+                    <div className="w-32 h-32 flex text-center items-center justify-center border rounded bg-gray-100 text-gray-400 text-xl">
+                        Tidak Ada Gambar
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     const FileLink = ({ label, url }) => (
         <div>
             <p className="text-gray-600">{label}</p>
-            <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 underline">
-                Lihat Dokumen
-            </a>
+            {url ? (
+                <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 underline">
+                    Lihat Dokumen
+                </a>
+            ) : (
+                <span className="text-gray-400 text-xl">Tidak Ada Dokumen</span>
+            )}
         </div>
     );
 
     if (isLoading) {
-          return <LoadingScreen />;
+        return <LoadingScreen />;
     }
     const FotoSiswa = getPublicUrl(data.foto_siswa);
     const FotoOrangTua = getPublicUrl(data.foto_orang_tua);
@@ -179,7 +194,7 @@ export default function DetailPage() {
                 <h2 className="text-xl font-semibold border-b pb-2">Usaha</h2>
                 <div className="grid grid-cols-2 gap-4">
                     <Detail label="Jenis Usaha" value={data.jenis_usaha} />
-                        <Detail label="Produk Usaha" value={data.produk_usaha} />
+                    <Detail label="Produk Usaha" value={data.produk_usaha} />
                 </div>
 
                 <h2 className="text-xl font-semibold border-b pb-2">
@@ -198,7 +213,6 @@ export default function DetailPage() {
                     <FileLink label="Surat Pernyataan" url={SuratPernyataan} />
                     <FileLink label="SKTM" url={SKTM} />
                     <FileLink label="Hasil PDF" url={HasilPDF} />
-
                 </div>
 
                 <h2 className="text-xl font-semibold border-b pb-2">Petugas</h2>
