@@ -90,10 +90,12 @@ export default function DetailPage() {
     const FotoRumahDepan = getPublicUrl(data.foto_rumah_depan);
     const FotoRumahDalam = getPublicUrl(data.foto_rumah_dalam);
     const FotoRumahSamping = getPublicUrl(data.foto_rumah_samping);
-    const SuratPernyataan = getPublicUrl(data.surat_pernyataan);
-    const SKTM = getPublicUrl(data.sktm);
-    const FotoProduk = getPublicUrl(data.foto_produk);
-    const HasilPDF = data.hasil_pdf;
+    const SuratPernyataan = data.surat_pernyataan
+        ? getPublicUrl(data.surat_pernyataan)
+        : null;
+    const SKTM = data.sktm ? getPublicUrl(data.sktm) : null;
+    const FotoProduk = data.foto_produk ? getPublicUrl(data.foto_produk) : null;
+    const HasilPDF = data.hasil_pdf ? getPublicUrl(data.hasil_pdf) : null;
 
     return (
         <div className="p-6 max-w-6xl mx-auto">
