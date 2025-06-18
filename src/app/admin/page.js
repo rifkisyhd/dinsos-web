@@ -236,6 +236,17 @@ export default function AdminPanel() {
         router.push("/login");
     };
 
+    // Tambahkan fungsi reset filter
+    const handleResetFilter = () => {
+        setSelectedYear("");
+        setSelectedMonth("");
+        setSelectedPetugas("");
+        setSelectedKabupaten("");
+        setSearchKeyword("");
+        setSearchInput("");
+        setPage(1);
+    };
+
     if (isLoading) {
         return <LoadingScreen />;
     }
@@ -264,24 +275,27 @@ export default function AdminPanel() {
                 </div>
 
                 {/* Kotak Filter */}
-                <FilterBar
-                    searchInput={searchInput}
-                    setSearchInput={setSearchInput}
-                    setSearchKeyword={setSearchKeyword}
-                    setPage={setPage}
-                    selectedYear={selectedYear}
-                    setSelectedYear={setSelectedYear}
-                    availableYears={availableYears}
-                    selectedMonth={selectedMonth}
-                    setSelectedMonth={setSelectedMonth}
-                    availableMonths={availableMonths}
-                    selectedKabupaten={selectedKabupaten}
-                    setSelectedKabupaten={setSelectedKabupaten}
-                    kabupatenList={kabupatenList}
-                    selectedPetugas={selectedPetugas}
-                    setSelectedPetugas={setSelectedPetugas}
-                    petugasList={petugasList}
-                />
+                <div className="flex items-center mb-4 gap-2">
+                    <FilterBar
+                        searchInput={searchInput}
+                        setSearchInput={setSearchInput}
+                        setSearchKeyword={setSearchKeyword}
+                        setPage={setPage}
+                        selectedYear={selectedYear}
+                        setSelectedYear={setSelectedYear}
+                        availableYears={availableYears}
+                        selectedMonth={selectedMonth}
+                        setSelectedMonth={setSelectedMonth}
+                        availableMonths={availableMonths}
+                        selectedKabupaten={selectedKabupaten}
+                        setSelectedKabupaten={setSelectedKabupaten}
+                        kabupatenList={kabupatenList}
+                        selectedPetugas={selectedPetugas}
+                        setSelectedPetugas={setSelectedPetugas}
+                        petugasList={petugasList}
+                        onResetFilter={handleResetFilter}
+                    />
+                </div>
 
                 {/* Tabel Data */}
                 <DataTable

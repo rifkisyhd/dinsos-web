@@ -18,28 +18,31 @@ export default function FilterBar({
     searchInput,
     setSearchInput,
     setPage,
+    onResetFilter,
 }) {
     return (
         <div className="bg-white p-6 rounded-xl shadow-md mb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {/* Search */}
-                  <div className="lg:col-span-2">
-                     <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="lg:col-span-2">
+                    <label
+                        htmlFor="search"
+                        className="block text-sm font-medium text-gray-700 mb-1">
                         Cari Nama atau NIK
                     </label>
-                <input
-                    type="text"
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            setSearchKeyword(searchInput);
-                            setPage(1); // reset pagination ke page awal
-                        }
-                    }}
-                    placeholder="Cari nama atau NIK..."
+                    <input
+                        type="text"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                setSearchKeyword(searchInput);
+                                setPage(1); // reset pagination ke page awal
+                            }
+                        }}
+                        placeholder="Cari nama atau NIK..."
                         className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                />
+                    />
                 </div>
 
                 {/* Tahun */}
@@ -129,6 +132,13 @@ export default function FilterBar({
                         ))}
                     </select>
                 </div>
+            </div>
+            <div className="flex justify-end mt-4">
+                <button
+                    onClick={onResetFilter}
+                    className="text-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors duration-200">
+                    Reset Filter
+                </button>
             </div>
         </div>
     );
