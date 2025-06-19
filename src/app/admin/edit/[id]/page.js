@@ -9,27 +9,111 @@ import Select from "react-select";
 
 // [TIDAK BERUBAH] - Definisi fields tetap sama
 const fields = [
-    { name: "nama_lengkap", label: "Nama Lengkap", type: "text", required: true },
+    {
+        name: "nama_lengkap",
+        label: "Nama Lengkap",
+        type: "text",
+        required: true,
+    },
     { name: "nik", label: "NIK", type: "text", required: true },
     { name: "nomor_kk", label: "Nomor KK", type: "text" },
     { name: "tempat_lahir", label: "Tempat Lahir", type: "text" },
     { name: "tanggal_lahir", label: "Tanggal Lahir", type: "date" },
-    { name: "jenis_kelamin", label: "Jenis Kelamin", type: "select", optionTable: "jenis_kelamin" },
-    { name: "agama", label: "Agama", type: "select", optionTable: "agama" },
-    { name: "kondisi_fisik", label: "Kondisi Fisik", type: "select", optionTable: "kondisi_fisik" },
-    { name: "alamat", label: "Alamat", type: "textarea" }, // Ubah ke textarea untuk input lebih panjang
+    {
+        name: "jenis_kelamin",
+        label: "Jenis Kelamin",
+        type: "select",
+        options: [
+            { value: "Laki-laki", label: "Laki-laki" },
+            { value: "Perempuan", label: "Perempuan" },
+        ],
+    }, // pakai opsi lokal, hapus optionTable
+    { name: "agama", label: "Agama", type: "select", optionTable: "agama" }, // select dari tabel
+    {
+        name: "kondisi_fisik",
+        label: "Kondisi Fisik",
+        type: "select",
+        optionTable: "kondisi_fisik",
+    }, // select dari tabel
+    { name: "alamat", label: "Alamat", type: "text" },
+    {
+        name: "provinsi",
+        label: "Provinsi",
+        type: "select",
+        optionTable: "provinsi",
+    }, // jika di screens pakai select
+    {
+        name: "kabupaten",
+        label: "Kabupaten",
+        type: "select",
+        optionTable: "kabupaten",
+    }, // jika di screens pakai select
+    {
+        name: "kecamatan",
+        label: "Kecamatan",
+        type: "select",
+        optionTable: "kecamatan",
+    }, // jika di screens pakai select
+    {
+        name: "kelurahan",
+        label: "Kelurahan",
+        type: "select",
+        optionTable: "kelurahan",
+    }, // jika di screens pakai select
     { name: "rt", label: "RT", type: "text" },
     { name: "rw", label: "RW", type: "text" },
-    { name: "ayah", label: "Nama Ayah", type: "text" },
-    { name: "ibu", label: "Nama Ibu", type: "text" },
-    { name: "pekerjaan_ayah", label: "Pekerjaan Ayah", type: "select", optionTable: "pekerjaan" },
-    { name: "pekerjaan_ibu", label: "Pekerjaan Ibu", type: "select", optionTable: "pekerjaan" },
-    { name: "penjelasan_pekerjaan", label: "Deskripsi Pekerjaan Orang Tua", type: "textarea" },
-    { name: "wali", label: "Wali (jika ada)", type: "text" },
-    { name: "penghasilan", label: "Penghasilan Keluarga / Bulan", type: "select", optionTable: "penghasilan" },
-    { name: "nominal_penghasilan", label: "Nominal Penghasilan", type: "number" },
-    { name: "pengeluaran", label: "Pengeluaran Keluarga / Bulan", type: "select", optionTable: "penghasilan" },
-    { name: "nominal_pengeluaran", label: "Nominal Pengeluaran", type: "number" },
+    {
+        name: "bansos",
+        label: "Bansos",
+        type: "checkbox-group",
+        optionTable: "bansos",
+    },
+    { name: "ayah", label: "Ayah", type: "text" },
+    { name: "ibu", label: "Ibu", type: "text" },
+    {
+        name: "pekerjaan_ayah",
+        label: "Pekerjaan Ayah sesuai KTP",
+        type: "select",
+        optionTable: "pekerjaan",
+    },
+    {
+        name: "pekerjaan_ibu",
+        label: "Pekerjaan Ibu sesuai KTP",
+        type: "select",
+        optionTable: "pekerjaan",
+    },
+    {
+        name: "penjelasan_pekerjaan",
+        label: "Penjelasan Pekerjaan Ayah dan Ibu",
+        type: "textarea",
+    },
+    {
+        name: "wali",
+        label: "Wali Calon Siswa (Jika tidak memiliki orang tua)",
+        type: "text",
+    },
+    {
+        name: "penghasilan",
+        label: "Penghasilan Keluarga Perbulan",
+        type: "select",
+        optionTable: "penghasilan", // sudah benar
+    },
+    {
+        name: "nominal_penghasilan",
+        label: "Nominal Penghasilan Keluarga",
+        type: "number",
+    },
+    {
+        name: "pengeluaran",
+        label: "Pengeluaran Keluarga Perbulan",
+        type: "select",
+        optionTable: "penghasilan",
+    },
+    {
+        name: "nominal_pengeluaran",
+        label: "Nominal Pengeluaran Keluarga",
+        type: "number",
+    },
     { name: "jumlah_tanggungan", label: "Jumlah Tanggungan", type: "number" },
     { name: "status_tanah", label: "Status Tanah", type: "text" },
     { name: "status_rumah", label: "Status Rumah", type: "text" },
@@ -50,23 +134,60 @@ const fields = [
 const formStructure = [
     {
         title: "Informasi Pribadi Siswa",
-        fields: ["nama_lengkap", "nik", "nomor_kk", "tempat_lahir", "tanggal_lahir", "jenis_kelamin", "agama", "kondisi_fisik"],
+        fields: [
+            "nama_lengkap",
+            "nik",
+            "nomor_kk",
+            "tempat_lahir",
+            "tanggal_lahir",
+            "jenis_kelamin",
+            "agama",
+            "kondisi_fisik",
+        ],
     },
     {
         title: "Alamat Tempat Tinggal",
-        fields: ["provinsi", "kabupaten", "kecamatan", "kelurahan", "rt", "rw", "alamat"],
+        fields: [
+            "provinsi",
+            "kabupaten",
+            "kecamatan",
+            "kelurahan",
+            "rt",
+            "rw",
+            "alamat",
+        ],
     },
     {
         title: "Informasi Keluarga",
-        fields: ["ayah", "ibu", "pekerjaan_ayah", "pekerjaan_ibu", "penjelasan_pekerjaan", "wali"],
+        fields: [
+            "ayah",
+            "ibu",
+            "pekerjaan_ayah",
+            "pekerjaan_ibu",
+            "penjelasan_pekerjaan",
+            "wali",
+        ],
     },
     {
         title: "Kondisi Ekonomi",
-        fields: ["penghasilan", "nominal_penghasilan", "pengeluaran", "nominal_pengeluaran", "jumlah_tanggungan"],
+        fields: [
+            "penghasilan",
+            "nominal_penghasilan",
+            "pengeluaran",
+            "nominal_pengeluaran",
+            "jumlah_tanggungan",
+        ],
     },
-     {
+    {
         title: "Aset & Properti",
-        fields: ["status_tanah", "status_rumah", "luas_tanah", "luas_rumah", "sumber_penerangan", "id_listrik"],
+        fields: [
+            "status_tanah",
+            "status_rumah",
+            "luas_tanah",
+            "luas_rumah",
+            "sumber_penerangan",
+            "id_listrik",
+        ],
     },
     {
         title: "Informasi Usaha (jika ada)",
@@ -74,7 +195,13 @@ const formStructure = [
     },
     {
         title: "Data Survei Petugas",
-        fields: ["petugas", "nama_petugas", "nomor_hp_petugas", "lokasi", "catatan"],
+        fields: [
+            "petugas",
+            "nama_petugas",
+            "nomor_hp_petugas",
+            "lokasi",
+            "catatan",
+        ],
     },
 ];
 
@@ -100,9 +227,14 @@ export default function EditPage() {
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
-            const { data, error } = await supabase.from("tb_input").select("*").eq("id", params.id).single();
+            const { data, error } = await supabase
+                .from("tb_input")
+                .select("*")
+                .eq("id", params.id)
+                .single();
             if (error) setError(error.message);
             setData(data);
+            console.log("DATA FETCHED:", data); // Tambahkan log ini
             setIsLoading(false);
         };
         if (params.id) fetchData();
@@ -110,61 +242,119 @@ export default function EditPage() {
 
     useEffect(() => {
         fields.forEach(async (field) => {
-            if (field.type === "select" && field.optionTable) {
-                setLoadingOptions((prev) => ({ ...prev, [field.name]: true }));
-                const { data: optData } = await supabase.from(field.optionTable).select("*");
+            if (field.type === "select" && field.options) {
                 setOptions((prev) => ({
                     ...prev,
-                    [field.name]: optData ? optData.map((opt) => ({ value: opt.nama || opt.value || opt.id, label: opt.nama || opt.label || opt.value })) : [],
+                    [field.name]: field.options,
+                }));
+            } else if (
+                (field.type === "select" || field.type === "checkbox-group") &&
+                field.optionTable
+            ) {
+                setLoadingOptions((prev) => ({ ...prev, [field.name]: true }));
+                const { data: optData } = await supabase
+                    .from(field.optionTable)
+                    .select("*");
+                // Tambahkan log ini
+                if (field.name === "bansos") {
+                    console.log("BANSOS OPTIONS:", optData);
+                }
+                setOptions((prev) => ({
+                    ...prev,
+                    [field.name]:
+                        field.name === "bansos"
+                            ? optData?.map((opt) => ({
+                                  value: opt.nama,
+                                  label: opt.nama,
+                              })) || []
+                            : optData?.map((opt) => ({
+                                  value: opt.value || opt.nama || opt.id,
+                                  label: opt.label || opt.nama || opt.value,
+                              })) || [],
                 }));
                 setLoadingOptions((prev) => ({ ...prev, [field.name]: false }));
             }
         });
     }, []);
-    
+
     useEffect(() => {
         const fetchKabupaten = async () => {
             setIsLoadingWilayah((prev) => ({ ...prev, kabupaten: true }));
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_WILAYAH}/regencies/35.json`);
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_WILAYAH}/regencies/35.json`,
+                );
                 const dataKab = await response.json();
-                setKabupatenList(dataKab.map((item) => ({ value: item.id, label: item.name })));
-            } catch (error) { console.error("Failed to fetch kabupaten:", error); } 
-            finally { setIsLoadingWilayah((prev) => ({ ...prev, kabupaten: false })); }
+                setKabupatenList(
+                    dataKab.map((item) => ({
+                        value: item.id,
+                        label: item.name,
+                    })),
+                );
+            } catch (error) {
+                console.error("Failed to fetch kabupaten:", error);
+            } finally {
+                setIsLoadingWilayah((prev) => ({ ...prev, kabupaten: false }));
+            }
         };
         fetchKabupaten();
     }, []);
 
     useEffect(() => {
         if (!data?.kabupaten) return;
-        const selectedKab = kabupatenList.find((item) => item.label === data.kabupaten);
+        const selectedKab = kabupatenList.find(
+            (item) => item.label === data.kabupaten,
+        );
         if (!selectedKab) return;
         const fetchKecamatan = async () => {
             setIsLoadingWilayah((prev) => ({ ...prev, kecamatan: true }));
-            setKecamatanList([]); setKelurahanList([]);
+            setKecamatanList([]);
+            setKelurahanList([]);
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_WILAYAH}/districts/${selectedKab.value}.json`);
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_WILAYAH}/districts/${selectedKab.value}.json`,
+                );
                 const dataKec = await response.json();
-                setKecamatanList(dataKec.map((item) => ({ value: item.id, label: item.name })));
-            } catch (error) { console.error("Failed to fetch kecamatan:", error); }
-            finally { setIsLoadingWilayah((prev) => ({ ...prev, kecamatan: false })); }
+                setKecamatanList(
+                    dataKec.map((item) => ({
+                        value: item.id,
+                        label: item.name,
+                    })),
+                );
+            } catch (error) {
+                console.error("Failed to fetch kecamatan:", error);
+            } finally {
+                setIsLoadingWilayah((prev) => ({ ...prev, kecamatan: false }));
+            }
         };
         fetchKecamatan();
     }, [data?.kabupaten, kabupatenList]);
 
     useEffect(() => {
         if (!data?.kecamatan) return;
-        const selectedKec = kecamatanList.find((item) => item.label === data.kecamatan);
+        const selectedKec = kecamatanList.find(
+            (item) => item.label === data.kecamatan,
+        );
         if (!selectedKec) return;
         const fetchKelurahan = async () => {
             setIsLoadingWilayah((prev) => ({ ...prev, kelurahan: true }));
             setKelurahanList([]);
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_WILAYAH}/villages/${selectedKec.value}.json`);
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_WILAYAH}/villages/${selectedKec.value}.json`,
+                );
                 const dataKel = await response.json();
-                setKelurahanList(dataKel.map((item) => ({ value: item.id, label: item.name })));
-            } catch (error) { console.error("Failed to fetch kelurahan:", error); }
-            finally { setIsLoadingWilayah((prev) => ({ ...prev, kelurahan: false })); }
+                setKelurahanList(
+                    dataKel.map((item) => ({
+                        value: item.id,
+                        label: item.name,
+                    })),
+                );
+            } catch (error) {
+                console.error("Failed to fetch kelurahan:", error);
+            } finally {
+                setIsLoadingWilayah((prev) => ({ ...prev, kelurahan: false }));
+            }
         };
         fetchKelurahan();
     }, [data?.kecamatan, kecamatanList]);
@@ -186,11 +376,18 @@ export default function EditPage() {
         if (!result.isConfirmed) return;
         setIsSaving(true);
         setError("");
-        const { error: updateError } = await supabase.from("tb_input").update(data).eq("id", params.id);
+        const { error: updateError } = await supabase
+            .from("tb_input")
+            .update(data)
+            .eq("id", params.id);
         setIsSaving(false);
         if (updateError) {
             setError(updateError.message);
-            Swal.fire("Gagal", `Data gagal disimpan: ${updateError.message}`, "error");
+            Swal.fire(
+                "Gagal",
+                `Data gagal disimpan: ${updateError.message}`,
+                "error",
+            );
         } else {
             await Swal.fire({
                 icon: "success",
@@ -204,26 +401,47 @@ export default function EditPage() {
     };
 
     if (isLoading) return <LoadingScreen />;
-    if (!data) return <div className="p-6 text-center">Data tidak ditemukan atau gagal dimuat.</div>;
+    if (!data)
+        return (
+            <div className="p-6 text-center">
+                Data tidak ditemukan atau gagal dimuat.
+            </div>
+        );
 
     // [DIREFACTOR] - JSX diubah untuk layout minimalis
     return (
         <div className="bg-slate-50 min-h-screen p-4 sm:p-6 lg:p-8">
             <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8">
                 <div className="mb-8">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Edit Data Siswa</h1>
-                    <p className="text-gray-500 mt-1">Perbarui informasi calon siswa di bawah ini.</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                        Edit Data Siswa
+                    </h1>
+                    <p className="text-gray-500 mt-1">
+                        Perbarui informasi calon siswa di bawah ini.
+                    </p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-12">
                         {formStructure.map((section) => {
                             // Cek apakah seksi ini harus ditampilkan
-                            const hasFieldsToRender = section.fields.some(fieldName => {
-                                // Field wilayah ditangani secara khusus
-                                if (["provinsi", "kabupaten", "kecamatan", "kelurahan"].includes(fieldName)) return true;
-                                return fields.find(f => f.name === fieldName);
-                            });
+                            const hasFieldsToRender = section.fields.some(
+                                (fieldName) => {
+                                    // Field wilayah ditangani secara khusus
+                                    if (
+                                        [
+                                            "provinsi",
+                                            "kabupaten",
+                                            "kecamatan",
+                                            "kelurahan",
+                                        ].includes(fieldName)
+                                    )
+                                        return true;
+                                    return fields.find(
+                                        (f) => f.name === fieldName,
+                                    );
+                                },
+                            );
 
                             if (!hasFieldsToRender) return null;
 
@@ -234,43 +452,205 @@ export default function EditPage() {
                                     </h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                                         {section.fields.map((fieldName) => {
-                                            const field = fields.find((f) => f.name === fieldName);
-                                            const isWideField = field?.type === 'textarea';
-                                            
+                                            const field = fields.find(
+                                                (f) => f.name === fieldName,
+                                            );
+                                            const isWideField =
+                                                field?.type === "textarea";
+
                                             // Dinamis mengatur span kolom
-                                            const containerClassName = isWideField ? "md:col-span-2" : "col-span-1";
-                                            
+                                            const containerClassName =
+                                                isWideField
+                                                    ? "md:col-span-2"
+                                                    : "col-span-1";
+
                                             // Handler untuk kasus-kasus khusus (wilayah)
-                                            if (fieldName === "provinsi") return (
-                                                <div key="provinsi" className={containerClassName}>
-                                                    <label className="block text-sm font-medium mb-1">Provinsi</label>
-                                                    <Select value={{ value: "35", label: "JAWA TIMUR" }} isDisabled={true} />
-                                                </div>
-                                            );
-                                            if (fieldName === "kabupaten") return (
-                                                <div key="kabupaten" className={containerClassName}>
-                                                    <label className="block text-sm font-medium mb-1">Kabupaten / Kota</label>
-                                                    <Select options={kabupatenList} value={kabupatenList.find(item => item.label === data.kabupaten) || null} onChange={(s) => { handleChange("kabupaten", s ? s.label : ""); handleChange("kecamatan", ""); handleChange("kelurahan", ""); }} isLoading={isLoadingWilayah.kabupaten} placeholder={isLoadingWilayah.kabupaten ? "Memuat..." : "Pilih..."} isClearable />
-                                                </div>
-                                            );
-                                            if (fieldName === "kecamatan") return (
-                                                <div key="kecamatan" className={containerClassName}>
-                                                    <label className="block text-sm font-medium mb-1">Kecamatan</label>
-                                                    <Select options={kecamatanList} value={kecamatanList.find(item => item.label === data.kecamatan) || null} onChange={(s) => { handleChange("kecamatan", s ? s.label : ""); handleChange("kelurahan", ""); }} isLoading={isLoadingWilayah.kecamatan} placeholder={isLoadingWilayah.kecamatan ? "Memuat..." : "Pilih..."} isDisabled={!data.kabupaten || isLoadingWilayah.kecamatan} isClearable />
-                                                </div>
-                                            );
-                                            if (fieldName === "kelurahan") return (
-                                                <div key="kelurahan" className={containerClassName}>
-                                                    <label className="block text-sm font-medium mb-1">Kelurahan / Desa</label>
-                                                    <Select options={kelurahanList} value={kelurahanList.find(item => item.label === data.kelurahan) || null} onChange={(s) => handleChange("kelurahan", s ? s.label : "")} isLoading={isLoadingWilayah.kelurahan} placeholder={isLoadingWilayah.kelurahan ? "Memuat..." : "Pilih..."} isDisabled={!data.kecamatan || isLoadingWilayah.kelurahan} isClearable />
-                                                </div>
-                                            );
+                                            if (fieldName === "provinsi")
+                                                return (
+                                                    <div
+                                                        key="provinsi"
+                                                        className={
+                                                            containerClassName
+                                                        }>
+                                                        <label className="block text-sm font-medium mb-1">
+                                                            Provinsi
+                                                        </label>
+                                                        <Select
+                                                            value={{
+                                                                value: "35",
+                                                                label: "JAWA TIMUR",
+                                                            }}
+                                                            isDisabled={true}
+                                                        />
+                                                    </div>
+                                                );
+                                            if (fieldName === "kabupaten")
+                                                return (
+                                                    <div
+                                                        key="kabupaten"
+                                                        className={
+                                                            containerClassName
+                                                        }>
+                                                        <label className="block text-sm font-medium mb-1">
+                                                            Kabupaten / Kota
+                                                        </label>
+                                                        <Select
+                                                            options={
+                                                                kabupatenList
+                                                            }
+                                                            value={
+                                                                kabupatenList.find(
+                                                                    (item) =>
+                                                                        item.label ===
+                                                                        data.kabupaten,
+                                                                ) || null
+                                                            }
+                                                            onChange={(s) => {
+                                                                handleChange(
+                                                                    "kabupaten",
+                                                                    s
+                                                                        ? s.label
+                                                                        : "",
+                                                                );
+                                                                handleChange(
+                                                                    "kecamatan",
+                                                                    "",
+                                                                );
+                                                                handleChange(
+                                                                    "kelurahan",
+                                                                    "",
+                                                                );
+                                                            }}
+                                                            isLoading={
+                                                                isLoadingWilayah.kabupaten
+                                                            }
+                                                            placeholder={
+                                                                isLoadingWilayah.kabupaten
+                                                                    ? "Memuat..."
+                                                                    : "Pilih..."
+                                                            }
+                                                            isClearable
+                                                        />
+                                                    </div>
+                                                );
+                                            if (fieldName === "kecamatan")
+                                                return (
+                                                    <div
+                                                        key="kecamatan"
+                                                        className={
+                                                            containerClassName
+                                                        }>
+                                                        <label className="block text-sm font-medium mb-1">
+                                                            Kecamatan
+                                                        </label>
+                                                        <Select
+                                                            options={
+                                                                kecamatanList
+                                                            }
+                                                            value={
+                                                                kecamatanList.find(
+                                                                    (item) =>
+                                                                        item.label ===
+                                                                        data.kecamatan,
+                                                                ) || null
+                                                            }
+                                                            onChange={(s) => {
+                                                                handleChange(
+                                                                    "kecamatan",
+                                                                    s
+                                                                        ? s.label
+                                                                        : "",
+                                                                );
+                                                                handleChange(
+                                                                    "kelurahan",
+                                                                    "",
+                                                                );
+                                                            }}
+                                                            isLoading={
+                                                                isLoadingWilayah.kecamatan
+                                                            }
+                                                            placeholder={
+                                                                isLoadingWilayah.kecamatan
+                                                                    ? "Memuat..."
+                                                                    : "Pilih..."
+                                                            }
+                                                            isDisabled={
+                                                                !data.kabupaten ||
+                                                                isLoadingWilayah.kecamatan
+                                                            }
+                                                            isClearable
+                                                        />
+                                                    </div>
+                                                );
+                                            if (fieldName === "kelurahan")
+                                                return (
+                                                    <div
+                                                        key="kelurahan"
+                                                        className={
+                                                            containerClassName
+                                                        }>
+                                                        <label className="block text-sm font-medium mb-1">
+                                                            Kelurahan / Desa
+                                                        </label>
+                                                        <Select
+                                                            options={
+                                                                kelurahanList
+                                                            }
+                                                            value={
+                                                                kelurahanList.find(
+                                                                    (item) =>
+                                                                        item.label ===
+                                                                        data.kelurahan,
+                                                                ) || null
+                                                            }
+                                                            onChange={(s) =>
+                                                                handleChange(
+                                                                    "kelurahan",
+                                                                    s
+                                                                        ? s.label
+                                                                        : "",
+                                                                )
+                                                            }
+                                                            isLoading={
+                                                                isLoadingWilayah.kelurahan
+                                                            }
+                                                            placeholder={
+                                                                isLoadingWilayah.kelurahan
+                                                                    ? "Memuat..."
+                                                                    : "Pilih..."
+                                                            }
+                                                            isDisabled={
+                                                                !data.kecamatan ||
+                                                                isLoadingWilayah.kelurahan
+                                                            }
+                                                            isClearable
+                                                        />
+                                                    </div>
+                                                );
 
                                             if (!field) return null;
 
                                             return (
-                                                <div key={field.name} className={containerClassName}>
-                                                    <FormInput field={field} value={data[field.name]} onChange={handleChange} options={options[field.name] || []} isLoading={loadingOptions[field.name]} />
+                                                <div
+                                                    key={field.name}
+                                                    className={
+                                                        containerClassName
+                                                    }>
+                                                    <FormInput
+                                                        field={field}
+                                                        value={data[field.name]}
+                                                        onChange={handleChange}
+                                                        options={
+                                                            options[
+                                                                field.name
+                                                            ] || []
+                                                        }
+                                                        isLoading={
+                                                            loadingOptions[
+                                                                field.name
+                                                            ]
+                                                        }
+                                                    />
                                                 </div>
                                             );
                                         })}
@@ -279,14 +659,24 @@ export default function EditPage() {
                             );
                         })}
                     </div>
-                    
-                    {error && <div className="mt-6 text-red-600 bg-red-100 p-3 rounded-md text-sm">{error}</div>}
+
+                    {error && (
+                        <div className="mt-6 text-red-600 bg-red-100 p-3 rounded-md text-sm">
+                            {error}
+                        </div>
+                    )}
 
                     <div className="flex gap-4 pt-8 mt-8 border-t">
-                        <button type="submit" disabled={isSaving || isLoading} className="px-6 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200">
+                        <button
+                            type="submit"
+                            disabled={isSaving || isLoading}
+                            className="px-6 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200">
                             {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
                         </button>
-                        <button type="button" onClick={() => router.back()} className="px-6 py-2 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors duration-200">
+                        <button
+                            type="button"
+                            onClick={() => router.back()}
+                            className="px-6 py-2 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors duration-200">
                             Batal
                         </button>
                     </div>
@@ -294,4 +684,4 @@ export default function EditPage() {
             </div>
         </div>
     );
-}   
+}
