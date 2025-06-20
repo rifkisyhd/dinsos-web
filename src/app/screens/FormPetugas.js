@@ -168,7 +168,7 @@ export default function FormPetugas({ setStep, form, setForm }) {
                     </Link>
                 </div>
                 <p className="ml-7 mt-2 text-sm text-red-600">
-                    Rekomendasi: Gunakan Browser Mozilla
+                    Rekomendasi: Gunakan Browser Google Chrome
                 </p>
             </div>
 
