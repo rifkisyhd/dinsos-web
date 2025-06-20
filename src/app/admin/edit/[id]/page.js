@@ -7,7 +7,6 @@ import LoadingScreen from "../../../components/LoadingScreen";
 import Swal from "sweetalert2";
 import Select from "react-select";
 
-// [TIDAK BERUBAH] - Definisi fields tetap sama
 const fields = [
     {
         name: "nama_lengkap",

@@ -21,8 +21,8 @@ export default function FilterBar({
     onResetFilter,
 }) {
     return (
-        <div className="bg-white p-6 rounded-xl shadow-md mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="bg-white p-6 rounded-xl shadow-md mb-8 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6">
                 {/* Search */}
                 <div className="lg:col-span-2">
                     <label
