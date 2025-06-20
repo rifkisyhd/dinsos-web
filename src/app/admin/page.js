@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Swal from "sweetalert2"; // Tambahkan import ini
 
 import LoadingScreen from "../components/LoadingScreen";
 import Pagination from "../components/Pagination";
@@ -247,6 +248,109 @@ export default function AdminPanel() {
         setPage(1);
     };
 
+    async function handleMerge() {
+        try {
+            // Ambil URL PDF dari filteredAllData (data yang sudah difilter)
+            const pdfUrls = filteredAllData
+                .filter((item) => item.hasil_pdf) // Pastikan URL tidak kosong
+                .map((item) => item.hasil_pdf);
+
+            if (pdfUrls.length === 0) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Tidak ada PDF",
+                    text: "Tidak ada file PDF yang dapat digabungkan dari data terpilih.",
+                });
+                return;
+            }
+
+            // Tampilkan indikator loading
+            Swal.fire({
+                title: "Sedang memproses...",
+                html: `Menggabungkan ${pdfUrls.length} file PDF`,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            // Tampilkan info jumlah file
+            console.log(`Menggabungkan ${pdfUrls.length} file PDF...`);
+
+            const resp = await fetch("/api/pdf-merge", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ pdfUrls }),
+            });
+
+            // Tutup loading dialog
+            Swal.close();
+
+            if (resp.ok) {
+                // Siapkan nama file default
+                const defaultFileName = `gabungan_${selectedYear || "semua"}_${
+                    selectedMonth || "semua"
+                }`;
+
+                // Gunakan SweetAlert2 untuk input nama file
+                const { value: fileName, isDismissed } = await Swal.fire({
+                    title: "Masukkan nama file",
+                    input: "text",
+                    inputLabel: "Nama file PDF hasil gabungan:",
+                    inputValue: defaultFileName,
+                    showCancelButton: true,
+                    inputValidator: (value) => {
+                        if (!value && !defaultFileName) {
+                            return "Nama file tidak boleh kosong!";
+                        }
+                    },
+                    cancelButtonText: "Batal",
+                    confirmButtonText: "Download",
+                });
+
+                // Cek jika user cancel
+                if (isDismissed || fileName === undefined) {
+                    return;
+                }
+
+                // Gunakan nama dari user atau default jika kosong
+                const finalFileName = (fileName || defaultFileName).trim();
+
+                const blob = await resp.blob();
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `${finalFileName}.pdf`; // Tambahkan ekstensi .pdf
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+
+                // Tampilkan pesan sukses
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil!",
+                    text: "File PDF berhasil diunduh.",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+            } else {
+                // Handle error
+                const errorText = await resp.text();
+                throw new Error(errorText);
+            }
+        } catch (error) {
+            console.error("Gagal menggabungkan PDF:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Gagal",
+                text: `Gagal menggabungkan PDF: ${error.message}`,
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     if (isLoading) {
         return <LoadingScreen />;
     }
@@ -254,7 +358,7 @@ export default function AdminPanel() {
     // --- MULAI PERUBAHAN TATA LETAK DI SINI ---
     return (
         <div className="min-h-screen w-full px-4 sm:px-6 py-10 bg-gray-50">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-screen-2xl mx-auto">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-3xl font-bold text-gray-800">
@@ -266,6 +370,14 @@ export default function AdminPanel() {
                             className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition-colors duration-200">
                             Logout
                         </button>
+
+                        {/* Tombol Merge PDF */}
+                        <button
+                            onClick={handleMerge}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                            Gabung PDF
+                        </button>
+
                         <ExportExcel
                             data={filteredAllData}
                             filterMonth={selectedMonth}
