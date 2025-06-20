@@ -5,6 +5,10 @@ import Select from "react-select";
 
 import TitleForm from "../components/TitleForm";
 import Button from "../components/Button";
+import {
+    requiredFields,
+    validateFormWithAlert,
+} from "../components/formValidation";
 
 export default function FormTempatTinggal({ setStep }) {
     const [form, setForm] = useState({
@@ -92,6 +96,19 @@ export default function FormTempatTinggal({ setStep }) {
             ...prev,
             [name]: value,
         }));
+    };
+
+    const handleNext = () => {
+        if (
+            !validateFormWithAlert(
+                form,
+                requiredFields.tempatTinggal,
+                "Semua data tempat tinggal wajib diisi!",
+            )
+        ) {
+            return;
+        }
+        setStep(4);
     };
 
     return (
@@ -208,7 +225,7 @@ export default function FormTempatTinggal({ setStep }) {
             {/* Area Tombol yang sudah diperbaiki */}
             <div className="flex justify-between mt-6 gap-8">
                 <Button label="Sebelumnya" onClick={() => setStep(2)} />
-                <Button label="Selanjutnya" onClick={() => setStep(4)} />
+                <Button label="Selanjutnya" onClick={handleNext} />
             </div>
         </form>
     );

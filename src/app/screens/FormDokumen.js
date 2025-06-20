@@ -3,6 +3,10 @@
 import Button from "../components/Button";
 import FileInput from "../components/FileInput";
 import { supabase } from "@/lib/supabaseClient";
+import {
+    requiredFields,
+    validateFormWithAlert,
+} from "../components/formValidation";
 
 export default function FormDokumen({ setStep, form, setForm }) {
     const handleFileChange = (e) => {
@@ -132,7 +136,21 @@ export default function FormDokumen({ setStep, form, setForm }) {
             {/* Area Tombol */}
             <div className="flex justify-between mt-6 gap-8">
                 <Button label="Sebelumnya" onClick={() => setStep(7)} />
-                <Button label="Selanjutnya" onClick={() => setStep(9)} />
+                <Button
+                    label="Selanjutnya"
+                    onClick={() => {
+                        if (
+                            !validateFormWithAlert(
+                                form,
+                                requiredFields.dokumen,
+                                "Semua dokumen wajib diunggah!",
+                            )
+                        ) {
+                            return;
+                        }
+                        setStep(9);
+                    }}
+                />
             </div>
         </form>
     );

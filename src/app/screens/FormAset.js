@@ -6,6 +6,10 @@ import { supabase } from "@/lib/supabaseClient";
 
 import TitleForm from "../components/TitleForm";
 import Button from "../components/Button";
+import {
+    requiredFields,
+    validateFormWithAlert,
+} from "../components/formValidation";
 
 export default function FormAset({ setStep, form, setForm }) {
     // State untuk menampung opsi dari database
@@ -192,7 +196,21 @@ export default function FormAset({ setStep, form, setForm }) {
 
             <div className="flex justify-between mt-6 gap-8">
                 <Button label="Sebelumnya" onClick={() => setStep(4)} />
-                <Button label="Selanjutnya" onClick={() => setStep(6)} />
+                <Button
+                    label="Selanjutnya"
+                    onClick={() => {
+                        if (
+                            !validateFormWithAlert(
+                                form,
+                                requiredFields.aset,
+                                "Semua data aset wajib diisi!",
+                            )
+                        ) {
+                            return;
+                        }
+                        setStep(6);
+                    }}
+                />
             </div>
         </form>
     );

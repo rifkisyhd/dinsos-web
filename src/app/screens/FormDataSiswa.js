@@ -4,6 +4,10 @@ import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Button from "../components/Button";
 import TitleForm from "../components/TitleForm";
+import {
+    requiredFields,
+    validateFormWithAlert,
+} from "../components/formValidation";
 
 // Sebaiknya client ini dipindah ke file terpisah (misal: src/lib/supabaseClient.js)
 const supabase = createClient(
@@ -35,15 +39,21 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
             try {
                 // Mengambil semua data secara bersamaan
                 // --- TAMBAHKAN FETCH DATA BARU ---
-                const [agamaRes, jenjangRes, kondisiFisikRes, bansosRes, bersediaTinggalRes, tandaTanganRes] =
-                    await Promise.all([
-                        supabase.from("agama").select("*"),
-                        supabase.from("jenjang").select("*"),
-                        supabase.from("kondisi_fisik").select("*"),
-                        supabase.from("bansos").select("*"),
-                        supabase.from("bersedia_tinggal").select("*"), // Ambil data dari tabel bersedia_tinggal
-                        supabase.from("tanda_tangan").select("*"),    // Ambil data dari tabel tanda_tangan
-                    ]);
+                const [
+                    agamaRes,
+                    jenjangRes,
+                    kondisiFisikRes,
+                    bansosRes,
+                    bersediaTinggalRes,
+                    tandaTanganRes,
+                ] = await Promise.all([
+                    supabase.from("agama").select("*"),
+                    supabase.from("jenjang").select("*"),
+                    supabase.from("kondisi_fisik").select("*"),
+                    supabase.from("bansos").select("*"),
+                    supabase.from("bersedia_tinggal").select("*"), // Ambil data dari tabel bersedia_tinggal
+                    supabase.from("tanda_tangan").select("*"), // Ambil data dari tabel tanda_tangan
+                ]);
                 // --- AKHIR PENAMBAHAN FETCH DATA ---
 
                 if (agamaRes.error) throw agamaRes.error;
@@ -63,7 +73,6 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                 setBersediaTinggalList(bersediaTinggalRes.data);
                 setTandaTanganList(tandaTanganRes.data);
                 // --- AKHIR SET STATE BARU ---
-
             } catch (error) {
                 console.error("Error fetching data:", error.message);
             } finally {
@@ -215,7 +224,7 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                     />
                 </div>
             </div>
-                
+
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 Jenjang yang dipilih
             </label>
@@ -262,15 +271,38 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                 )}
             </select>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Masuk DTSEN desil ke</label>
-            <input name="dtsenDesil" type="number" value={form.dtsenDesil || ""} onChange={handleChange} className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4" placeholder="Masukkan desil (jika ada)" />
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Masuk DTSEN desil ke
+            </label>
+            <input
+                name="dtsenDesil"
+                type="number"
+                value={form.dtsenDesil || ""}
+                onChange={handleChange}
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4"
+                placeholder="Masukkan desil (jika ada)"
+            />
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sekolah Asal</label>
-            <input name="sekolahAsal" value={form.sekolahAsal || ""} onChange={handleChange} className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4" placeholder="Masukkan sekolah asal" />
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Sekolah Asal
+            </label>
+            <input
+                name="sekolahAsal"
+                value={form.sekolahAsal || ""}
+                onChange={handleChange}
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4"
+                placeholder="Masukkan sekolah asal"
+            />
 
             {/* --- KODE DIUBAH DI SINI --- */}
-            <label className="block text-sm font-medium text-gray-700 mb-1">Apakah bersedia tinggal di asrama?</label>
-            <select name="bersediaAsrama" value={form.bersediaAsrama || ""} onChange={handleChange} className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Apakah bersedia tinggal di asrama?
+            </label>
+            <select
+                name="bersediaAsrama"
+                value={form.bersediaAsrama || ""}
+                onChange={handleChange}
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4">
                 {loading ? (
                     <option>Memuat...</option>
                 ) : (
@@ -285,8 +317,14 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                 )}
             </select>
 
-            <label className="block text-sm font-medium text-gray-700 mb-1">Apakah sudah menandatangani surat pernyataan?</label>
-            <select name="sudahPernyataan" value={form.sudahPernyataan || ""} onChange={handleChange} className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Apakah sudah menandatangani surat pernyataan?
+            </label>
+            <select
+                name="sudahPernyataan"
+                value={form.sudahPernyataan || ""}
+                onChange={handleChange}
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mb-4">
                 {loading ? (
                     <option>Memuat...</option>
                 ) : (
@@ -343,8 +381,22 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
 
             <div className="flex justify-between mt-6 gap-8">
                 <Button label="Sebelumnya" onClick={() => setStep(1)} />
-                <Button label="Selanjutnya" onClick={() => setStep(3)} />
+                <Button
+                    label="Selanjutnya"
+                    onClick={() => {
+                        if (
+                            !validateFormWithAlert(
+                                form,
+                                requiredFields.siswa,
+                                "Semua data siswa wajib diisi!",
+                            )
+                        ) {
+                            return;
+                        }
+                        setStep(3);
+                    }}
+                />
             </div>
         </form>
     );
-}   
+}

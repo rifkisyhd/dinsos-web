@@ -6,6 +6,10 @@ import Image from "next/image";
 
 import TitleForm from "../components/TitleForm";
 import Button from "../components/Button";
+import {
+    requiredFields,
+    validateFormWithAlert,
+} from "../components/formValidation";
 
 export default function FormDataUsaha({ setStep, form, setForm, allFormData }) {
     const [jenisUsahaOptions, setJenisUsahaOptions] = useState([]);
@@ -164,7 +168,18 @@ export default function FormDataUsaha({ setStep, form, setForm, allFormData }) {
                 <Button
                     label="Selanjutnya"
                     type="button"
-                    onClick={() => setStep(7)}
+                    onClick={() => {
+                        if (
+                            !validateFormWithAlert(
+                                form,
+                                requiredFields.usaha,
+                                "Semua data usaha wajib diisi!",
+                            )
+                        ) {
+                            return;
+                        }
+                        setStep(7);
+                    }}
                     className="bg-blue-500 text-white px-4 py-2 rounded"
                 />
             </div>

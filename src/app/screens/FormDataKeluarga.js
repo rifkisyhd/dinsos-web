@@ -6,6 +6,10 @@ import { createClient } from "@supabase/supabase-js";
 
 import TitleForm from "../components/TitleForm";
 import Button from "../components/Button";
+import {
+    requiredFields,
+    validateFormWithAlert,
+} from "../components/formValidation";
 
 // Sebaiknya client ini dipindah ke file terpisah (misal: src/lib/supabaseClient.js)
 const supabase = createClient(
@@ -220,7 +224,21 @@ export default function FormDataKeluarga({ setStep, form, setForm }) {
             {/* Area Tombol yang sudah responsif */}
             <div className="flex justify-between mt-6 gap-8">
                 <Button label="Sebelumnya" onClick={() => setStep(3)} />
-                <Button label="Selanjutnya" onClick={() => setStep(5)} />
+                <Button
+                    label="Selanjutnya"
+                    onClick={() => {
+                        if (
+                            !validateFormWithAlert(
+                                form,
+                                requiredFields.keluarga,
+                                "Semua data keluarga wajib diisi!",
+                            )
+                        ) {
+                            return;
+                        }
+                        setStep(5);
+                    }}
+                />
             </div>
         </form>
     );

@@ -7,6 +7,10 @@ import Swal from "sweetalert2";
 import Button from "../components/Button";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import {
+    requiredFields,
+    validateFormWithAlert,
+} from "../components/formValidation";
 
 const Select = dynamic(() => import("react-select"), {
     ssr: false,
@@ -61,7 +65,15 @@ export default function FormPetugas({ setStep, form, setForm }) {
             });
             return;
         }
-        console.log("Data Petugas:", form);
+        if (
+            !validateFormWithAlert(
+                form,
+                requiredFields.petugas,
+                "Semua data petugas wajib diisi!",
+            )
+        ) {
+            return;
+        }
         setStep(2);
     };
 
