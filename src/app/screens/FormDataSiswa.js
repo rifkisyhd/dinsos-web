@@ -8,6 +8,7 @@ import {
     requiredFields,
     validateFormWithAlert,
 } from "../components/formValidation";
+import Swal from "sweetalert2";
 
 // Sebaiknya client ini dipindah ke file terpisah (misal: src/lib/supabaseClient.js)
 const supabase = createClient(
@@ -391,6 +392,14 @@ export default function FormDataSiswa({ setStep, form, setForm }) {
                                 "Semua data siswa wajib diisi!",
                             )
                         ) {
+                            return;
+                        }
+                        if (!form.nik || form.nik.toString().length < 16) {
+                            Swal.fire({
+                                icon: "warning",
+                                title: "NIK tidak valid",
+                                text: "NIK harus terdiri dari minimal 16 digit.",
+                            });
                             return;
                         }
                         setStep(3);
