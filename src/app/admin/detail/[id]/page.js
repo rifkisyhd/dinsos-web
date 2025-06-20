@@ -95,7 +95,12 @@ export default function DetailPage() {
         : null;
     const SKTM = data.sktm ? getPublicUrl(data.sktm) : null;
     const FotoProduk = data.foto_produk ? getPublicUrl(data.foto_produk) : null;
-    const HasilPDF = data.hasil_pdf ? getPublicUrl(data.hasil_pdf) : null;
+    const HasilPDF =
+        data.hasil_pdf && data.hasil_pdf.startsWith("http")
+            ? data.hasil_pdf
+            : data.hasil_pdf
+            ? getPublicUrl(data.hasil_pdf)
+            : null;
 
     return (
         <div className="p-6 max-w-6xl mx-auto">
