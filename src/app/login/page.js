@@ -9,12 +9,14 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [waitingSession, setWaitingSession] = useState(false);
 
     // login/page.jsx
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        setWaitingSession(false);
 
         try {
             // Step 1: Ambil email berdasarkan username
@@ -36,7 +38,7 @@ export default function LoginPage() {
 
             if (loginError) throw loginError;
 
-            console.log("Login sukses, menunggu session...");
+            setWaitingSession(true); // Tampilkan loading session
 
             // Step 3: Tunggu session muncul beneran (polling kecil)
             let retries = 5;
@@ -46,7 +48,7 @@ export default function LoginPage() {
                 } = await supabase.auth.getSession();
 
                 if (session) {
-                    console.log("Session siap, redirect ke /admin");
+                    setWaitingSession(false);
                     router.push("/admin");
                     return;
                 }
@@ -55,17 +57,46 @@ export default function LoginPage() {
                 retries--;
             }
 
+            setWaitingSession(false);
             throw new Error("Gagal mendapatkan session");
         } catch (err) {
             console.error(err);
             setError("Username atau password salah!");
         } finally {
             setLoading(false);
+            setWaitingSession(false);
         }
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
+        <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 relative">
+            {/* Loading overlay saat menunggu session */}
+            {waitingSession && (
+                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg px-8 py-6 flex flex-col items-center shadow-lg">
+                        <svg
+                            className="animate-spin h-8 w-8 text-blue-500 mb-3"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24">
+                            <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"></circle>
+                            <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v8z"></path>
+                        </svg>
+                        <span className="text-gray-700 font-semibold">
+                            Mengambil token sesi, mohon tunggu...
+                        </span>
+                    </div>
+                </div>
+            )}
             <div className="bg-white p-8 rounded shadow-md w-96">
                 <h1 className="text-2xl font-bold mb-6 text-center">
                     Login Admin

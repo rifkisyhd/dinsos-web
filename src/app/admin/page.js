@@ -30,6 +30,7 @@ export default function AdminPanel() {
     const totalPages = Math.ceil(totalCount / perPage);
     const [searchInput, setSearchInput] = useState("");
     const [filteredAllData, setFilteredAllData] = useState([]);
+    const [sortOrder, setSortOrder] = useState("desc"); // "desc" = terbaru, "asc" = terlama
 
     const handlePageChange = (newPage) => {
         setPage(newPage);
@@ -60,6 +61,7 @@ export default function AdminPanel() {
         selectedYear,
         selectedPetugas,
         selectedKabupaten,
+        sortOrder, // tambahkan ini
     ]);
 
     useEffect(() => {
@@ -81,7 +83,7 @@ export default function AdminPanel() {
             let query = supabase
                 .from("tb_input")
                 .select("*", { count: "exact" })
-                .order("created_at", { ascending: false });
+                .order("created_at", { ascending: sortOrder === "asc" }); // ubah di sini
 
             // === APPLY FILTER ===
             if (searchKeyword) {
@@ -145,7 +147,7 @@ export default function AdminPanel() {
             let allFilteredQuery = supabase
                 .from("tb_input")
                 .select("*")
-                .order("created_at", { ascending: false });
+                .order("created_at", { ascending: sortOrder === "asc" }); // ubah di sini
 
             if (searchKeyword) {
                 allFilteredQuery = allFilteredQuery.or(
@@ -406,6 +408,8 @@ export default function AdminPanel() {
                         setSelectedPetugas={setSelectedPetugas}
                         petugasList={petugasList}
                         onResetFilter={handleResetFilter}
+                        sortOrder={sortOrder}
+                        setSortOrder={setSortOrder}
                     />
                 </div>
 

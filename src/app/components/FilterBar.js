@@ -19,10 +19,12 @@ export default function FilterBar({
     setSearchInput,
     setPage,
     onResetFilter,
+    sortOrder,
+    setSortOrder,
 }) {
     return (
         <div className="bg-white p-6 rounded-xl shadow-md mb-8 w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-8 gap-6">
                 {/* Search */}
                 <div className="lg:col-span-2">
                     <label
@@ -130,6 +132,23 @@ export default function FilterBar({
                                 {nama}
                             </option>
                         ))}
+                    </select>
+                </div>
+
+                {/* Urutan */}
+                <div>
+                    <label
+                        htmlFor="filter-urutan"
+                        className="block text-sm font-medium text-gray-700 mb-1">
+                        Urutkan
+                    </label>
+                    <select
+                        id="filter-urutan"
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value)}
+                        className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option value="desc">Terbaru</option>
+                        <option value="asc">Terlama</option>
                     </select>
                 </div>
             </div>
