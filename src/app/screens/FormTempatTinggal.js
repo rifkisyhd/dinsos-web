@@ -6,7 +6,16 @@ import Select from "react-select";
 import TitleForm from "../components/TitleForm";
 import Button from "../components/Button";
 
-export default function FormTempatTinggal({ setStep, form, setForm }) {
+export default function FormTempatTinggal({ setStep }) {
+    const [form, setForm] = useState({
+        provinsi: "Jawa Timur",
+        kabupaten: "",
+        kecamatan: "",
+        kelurahan: "",
+        rw: "",
+        rt: "",
+        alamat: "",
+    });
     const [kabupatenList, setKabupatenList] = useState([]);
     const [kecamatanList, setKecamatanList] = useState([]);
     const [kelurahanList, setKelurahanList] = useState([]);
@@ -94,10 +103,7 @@ export default function FormTempatTinggal({ setStep, form, setForm }) {
             </label>
             <Select
                 options={[{ value: "35", label: "Jawa Timur" }]}
-                value={{
-                    value: form.provinsi,
-                    label: "Jawa Timur",
-                }}
+                value={{ value: "35", label: "Jawa Timur" }}
                 isDisabled={true}
                 className="mb-4"
             />

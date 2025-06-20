@@ -20,7 +20,8 @@ export default function Page() {
     // State untuk setiap form
     const [formSiswa, setFormSiswa] = useState({});
     const [formTempatTinggal, setFormTempatTinggal] = useState({
-        provinsi: "35",
+        provinsi: "Jawa Timur",
+        // ...field lain jika ada
     });
     const [formKeluarga, setFormKeluarga] = useState({});
     const [formAset, setFormAset] = useState({});
@@ -54,8 +55,13 @@ export default function Page() {
                 if (!file) return "";
                 try {
                     const { data, error } = await supabase.storage
-                        .from(process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "uploads")
-                        .upload(`${name}/${Date.now()}_${file.name}`, file, { upsert: true });
+                        .from(
+                            process.env.NEXT_PUBLIC_SUPABASE_BUCKET ||
+                                "uploads",
+                        )
+                        .upload(`${name}/${Date.now()}_${file.name}`, file, {
+                            upsert: true,
+                        });
                     if (error) throw new Error(error.message);
                     return data.path;
                 } catch (error) {
@@ -65,12 +71,30 @@ export default function Page() {
             };
 
             // Upload semua file dokumen (logika ini tetap sama)
-            const fotoSiswaPath = await uploadFile("fotoSiswa", dokumen.fotoSiswa);
-            const fotoOrangTuaPath = await uploadFile("fotoOrangTua", dokumen.fotoOrangTua);
-            const fotoRumahDepanPath = await uploadFile("fotoRumahDepan", dokumen.fotoRumahDepan);
-            const fotoRumahDalamPath = await uploadFile("fotoRumahDalam", dokumen.fotoRumahDalam);
-            const fotoRumahSampingPath = await uploadFile("fotoRumahSamping", dokumen.fotoRumahSamping);
-            const suratPernyataanPath = await uploadFile("suratPernyataan", dokumen.suratPernyataan);
+            const fotoSiswaPath = await uploadFile(
+                "fotoSiswa",
+                dokumen.fotoSiswa,
+            );
+            const fotoOrangTuaPath = await uploadFile(
+                "fotoOrangTua",
+                dokumen.fotoOrangTua,
+            );
+            const fotoRumahDepanPath = await uploadFile(
+                "fotoRumahDepan",
+                dokumen.fotoRumahDepan,
+            );
+            const fotoRumahDalamPath = await uploadFile(
+                "fotoRumahDalam",
+                dokumen.fotoRumahDalam,
+            );
+            const fotoRumahSampingPath = await uploadFile(
+                "fotoRumahSamping",
+                dokumen.fotoRumahSamping,
+            );
+            const suratPernyataanPath = await uploadFile(
+                "suratPernyataan",
+                dokumen.suratPernyataan,
+            );
             const sktmPath = await uploadFile("sktm", dokumen.sktm);
 
             // Mapping ke snake_case (logika ini tetap sama)
@@ -114,7 +138,10 @@ export default function Page() {
                 id_listrik: finalData.idListrik,
                 jenis_usaha: finalData.jenisUsahaId,
                 produk_usaha: finalData.produkUsaha,
-                foto_produk: await uploadFile("fotoProduk", formUsaha.fotoProduk),
+                foto_produk: await uploadFile(
+                    "fotoProduk",
+                    formUsaha.fotoProduk,
+                ),
                 foto_siswa: fotoSiswaPath,
                 foto_orang_tua: fotoOrangTuaPath,
                 foto_rumah_depan: fotoRumahDepanPath,
@@ -134,7 +161,7 @@ export default function Page() {
             };
 
             // PERUBAHAN UTAMA DIMULAI DI SINI
-            
+
             // 1. Generate PDF dan dapatkan datanya sebagai Blob
             const pdfBlob = await generateAssessmentPDF(mappedData);
             if (!pdfBlob) {
@@ -188,7 +215,7 @@ export default function Page() {
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Buat link download dari Blob yang sudah ada di memori
-                    const link = document.createElement('a');
+                    const link = document.createElement("a");
                     link.href = URL.createObjectURL(pdfBlob);
                     link.download = `pendaftaran_${mappedData.nik}.pdf`;
                     document.body.appendChild(link);
@@ -271,4 +298,4 @@ export default function Page() {
             )}
         </>
     );
-}   
+}
